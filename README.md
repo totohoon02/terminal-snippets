@@ -1,12 +1,13 @@
 # terminal-snippets
 
 ## How to use
-Include to .bash_profile / .zshrc
+Include to .bash_profile / .zshrc <br>
 
 ```bash
 source ~/.python_snippet
 ```
 
+## Combined >> '.bash_profile'
 ### python
 - venv 'py:version'
 - activate
