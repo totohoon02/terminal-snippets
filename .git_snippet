@@ -1,0 +1,4 @@
+ignore(){
+    language=$(echo "$1" | sed -E 's/^(.)/\U\1/')
+    curl https://raw.githubusercontent.com/github/gitignore/refs/heads/main/$language.gitignore > .gitignore
+}
