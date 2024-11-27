@@ -15,3 +15,24 @@ pk() {
         echo "No process found on $port"
     fi
 }
+
+host() {
+    if [ -z "$1" ]; then
+        echo "Usage: host <port>"
+        return 1
+    fi
+
+    local port="$1"
+    local url="http://localhost:$port"
+
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+        start "$url"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        open "$url"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        xdg-open "$url"
+    else
+        echo "Unsupported operating system: $OSTYPE"
+        return 1
+    fi
+}
