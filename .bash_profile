@@ -128,6 +128,29 @@ pk() {
     fi
 }
 
+host() {
+    if [ -z "$1" ]; then
+        echo "Usage: host <port>"
+        return 1
+    fi
+
+    local port="$1"
+    local url="http://localhost:$port"
+
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+        start "$url"
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        open "$url"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        xdg-open "$url"
+    else
+        echo "Unsupported operating system: $OSTYPE"
+        return 1
+    fi
+}
+
+
+
 # git
 ignore(){
     language=$(echo "$1" | sed -E 's/^(.)/\U\1/')
@@ -157,7 +180,8 @@ list(){
     echo ""
     echo "###### BASH COMMAND ######"
     echo "pk <port>"
-    echo
+    echo "host <port>"
+    echo ""
     echo "###### github COMMAND ######"
     echo "git <language>"
 }
