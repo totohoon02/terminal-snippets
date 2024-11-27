@@ -26,6 +26,7 @@ source ~/.python_snippet
 
 ### bash
 - pk 'port'
+- host 'port'
 
 ### git
 - ignore 'python' (.gitignore for python)
