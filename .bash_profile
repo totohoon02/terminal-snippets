@@ -108,7 +108,6 @@ db(){
     echo 'models.Base.metadata.create_all(bind=engine)' >> main.py
 }
 
-
 # bash
 pk() {
     port=$1
@@ -184,4 +183,23 @@ list(){
     echo ""
     echo "###### github COMMAND ######"
     echo "git <language>"
+}
+
+
+## utils
+ct(){
+    echo 'import sys' > codingTest.py
+    echo '' >> codingTest.py
+    echo 'input = sys.stdin.readline' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'def spt():' >> codingTest.py
+    echo '    return input().split(" ")' >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'def spt_map_int():' >> codingTest.py
+    echo '    return list(map(int, input().split(" ")))' >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'def assertEqual(a, b):' >> codingTest.py
+    echo '    assert a == b' >> codingTest.py
 }
