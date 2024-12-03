@@ -30,3 +30,6 @@ source ~/.python_snippet
 
 ### git
 - ignore 'python' (.gitignore for python)
+
+### coding test util
+- ct
