@@ -27,10 +27,10 @@ source ~/.python_snippet
 ### bash
 - pk 'port'
 - host 'port'
+- rcopy 'input' (reverse input and copy it -> tupni)
 
 ### git
 - ignore 'python' (.gitignore for python)
 
 ### coding test util
 - ct
-- rcopy 'input' (reverse input and copy it -> tupni)
