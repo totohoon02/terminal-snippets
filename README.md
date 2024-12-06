@@ -33,3 +33,4 @@ source ~/.python_snippet
 
 ### coding test util
 - ct
+- rcopy <input> (reverse input and copy it)
