@@ -182,7 +182,7 @@ list(){
     echo "host <port>"
     echo ""
     echo "###### github COMMAND ######"
-    echo "git <language>"
+    echo "ignore <language>"
 }
 
 
