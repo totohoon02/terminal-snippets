@@ -28,6 +28,7 @@ source ~/.python_snippet
 - pk 'port'
 - host 'port'
 - rcopy 'input' (reverse input and copy it -> tupni)
+- after date (date from today)
 
 ### git
 - ignore 'python' (.gitignore for python)
