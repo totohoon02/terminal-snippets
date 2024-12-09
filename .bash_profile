@@ -221,3 +221,10 @@ rcopy(){
         echo "Not supported OS"
     fi
 }
+
+
+after(){
+    today=$(date +%Y-%m-%d)
+    future_date=$(date -d "$today +$1 days" +%Y-%m-%d)
+    echo $future_date
+}
