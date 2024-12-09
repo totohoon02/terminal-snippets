@@ -183,6 +183,10 @@ list(){
     echo ""
     echo "###### github COMMAND ######"
     echo "ignore <language>"
+    echo "###### util COMMAND ######"
+    echo ct
+    echo "rcopy <str>"
+    echo "after <num>"
 }
 
 
@@ -222,8 +226,11 @@ rcopy(){
     fi
 }
 
-
 after(){
+    if [ -z "$1" ]; then
+        echo "start 20 rest 8"
+        return 1
+    fi
     today=$(date +%Y-%m-%d)
     future_date=$(date -d "$today +$1 days" +%Y-%m-%d)
     echo $future_date
