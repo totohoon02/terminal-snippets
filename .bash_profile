@@ -152,16 +152,14 @@ host() {
 
 # git
 ignore(){
-    if [[ "$(uname)" == "Darwin" ]] || [[ "$(uname)" == "Linux" ]]; then
-        language=$(echo "$1" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')
-    elif [[ "$(uname -o)" == "Msys" ]] || [[ "$(uname -o)" == "Cygwin" ]] || [[ "$(uname -o)" == "Windows_NT" ]]; then
-        language=$(echo "$1" | sed -r "s/^./\U&/")
+    language=$(echo "$1" | sed -E 's/^(.)/\U\1/')
+
+    if [[ "$language" == "Spring" ]]; then
+        curl https://raw.githubusercontent.com/spring-projects/spring-framework/refs/heads/main/.gitignore > .gitignore
+    else 
+        curl https://raw.githubusercontent.com/github/gitignore/refs/heads/main/$language.gitignore > .gitignore
     fi
-
-    curl -s https://raw.githubusercontent.com/github/gitignore/refs/heads/main/"$language".gitignore > .gitignore
 }
-
-
 
 # help
 
