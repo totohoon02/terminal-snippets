@@ -156,6 +156,10 @@ ignore(){
 
     if [[ "$language" == "Spring" ]]; then
         curl https://raw.githubusercontent.com/spring-projects/spring-framework/refs/heads/main/.gitignore > .gitignore
+    elif  [[ "$language" == "Fastapi" ]]; then
+        curl https://raw.githubusercontent.com/fastapi/fastapi/refs/heads/master/.gitignore > .gitignore
+    elif  [[ "$language" == "Node" ]]; then
+        curl https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Node.gitignore > .gitignore
     else 
         curl https://raw.githubusercontent.com/github/gitignore/refs/heads/main/$language.gitignore > .gitignore
     fi
