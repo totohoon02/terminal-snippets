@@ -15,7 +15,7 @@ pydocker(){
     echo '' >> Dockerfile
     echo 'EXPOSE 8000' >> Dockerfile
     echo '' >> Dockerfile
-    echo 'CMD ["uvicorn", "main:app"]' >> Dockerfile
+    echo 'CMD ["uvicorn", "main:app", "host", "0.0.0.0"]' >> Dockerfile
 }
 
 build(){
