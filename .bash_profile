@@ -18,6 +18,22 @@ pydocker(){
     echo 'CMD ["uvicorn", "main:app", "host", "0.0.0.0"]' >> Dockerfile
 }
 
+jdocker() {
+    name=${1:-app}
+
+    echo 'FROM openjdk:21-jdk-slim' > Dockerfile
+    echo '' >> Dockerfile
+    echo 'WORKDIR /app' >> Dockerfile
+    echo '' >> Dockerfile
+    echo "ARG JAR_FILE=target/${name}.jar" >> Dockerfile
+    echo '' >> Dockerfile
+    echo 'COPY ${JAR_FILE} app.jar' >> Dockerfile
+    echo '' >> Dockerfile
+    echo 'EXPOSE 8080' >> Dockerfile
+    echo '' >> Dockerfile
+    echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+}
+
 build(){
     docker build -t "$@" .
 }
@@ -176,6 +192,7 @@ list(){
     echo "up"
     echo "down"
     echo "pydocker"
+    echo "jdocker"
     echo "build <image:dev>"
     echo "rmi"
     echo ""
@@ -194,6 +211,7 @@ list(){
     echo ""
     echo "###### github COMMAND ######"
     echo "ignore <language>"
+    echo ""
     echo "###### util COMMAND ######"
     echo ct
     echo "rcopy <str>"
