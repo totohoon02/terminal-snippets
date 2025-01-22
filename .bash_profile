@@ -164,6 +164,15 @@ host() {
     fi
 }
 
+cost(){
+    if [ -z "$1" ]; then
+        echo "Usage: cost <port>"
+        return 1
+    fi
+
+    local port="$1"
+    curl "http://localhost:$port"
+}
 
 
 # git
@@ -208,6 +217,7 @@ list(){
     echo "###### BASH COMMAND ######"
     echo "pk <port>"
     echo "host <port>"
+    echo "cost <port>"
     echo ""
     echo "###### github COMMAND ######"
     echo "ignore <language>"
