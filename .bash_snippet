@@ -37,6 +37,16 @@ host() {
     fi
 }
 
+cost(){
+    if [ -z "$1" ]; then
+        echo "Usage: cost <port>"
+        return 1
+    fi
+
+    local port="$1"
+    curl "http://localhost:$port"
+}
+
 rcopy(){
     reversed=$(echo $1 | awk '{ for(i=length; i>0; i--) printf "%s", substr($0, i, 1); print "" }')
     
