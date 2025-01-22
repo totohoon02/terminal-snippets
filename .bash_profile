@@ -164,7 +164,7 @@ host() {
     fi
 }
 
-cost(){
+culst(){
     if [ -z "$1" ]; then
         echo "Usage: cost <port>"
         return 1
