@@ -18,19 +18,31 @@ pk() {
 
 host() {
     if [ -z "$1" ]; then
-        echo "Usage: host <port>"
+        echo "Usage: host <port> [--secret]"
         return 1
     fi
 
     local port="$1"
     local url="http://localhost:$port"
+    local browser_flag=""
+
+    if [[ "$2" == "--secret" || "$2" == "-s" ]]; then
+        case "$OSTYPE" in
+            msys|cygwin|win32)
+                browser_flag="--incognito" ;;
+            darwin*)
+                browser_flag="--incognito" ;;
+            linux-gnu*)
+                browser_flag="--incognito" ;; # 기본적으로 Chrome 기준
+        esac
+    fi
 
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
-        start "$url"
+        start chrome "$browser_flag" "$url"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        open "$url"
+        open -a "Google Chrome" --args "$browser_flag" "$url"
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        xdg-open "$url"
+        xdg-open "$url" # xdg-open은 기본 브라우저를 사용함
     else
         echo "Unsupported operating system: $OSTYPE"
         return 1
