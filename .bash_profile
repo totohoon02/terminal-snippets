@@ -54,6 +54,8 @@ venv(){
     else
         python$version -m venv .venv
     fi
+
+    pip install ruff
 }
 
 activate(){
@@ -75,7 +77,7 @@ freeze(){
 fast(){
     venv
     activate
-    pip install fastapi uvicorn
+    pip install fastapi uvicorn ruff
     freeze
 
     echo 'from fastapi import FastAPI' > main.py
@@ -90,6 +92,11 @@ fast(){
 run() {
     port=${1:-8000}
     uvicorn main:app --reload --port=$port
+}
+
+rr(){
+    ruff format
+    ruff check
 }
 
 db(){
