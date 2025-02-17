@@ -228,6 +228,7 @@ list(){
     echo "###### PYTHON ######"
     echo "venv <py:version>"
     echo "activate"
+    echo "rr"
     echo "requirements"
     echo "freeze"
     echo "fast"
@@ -290,7 +291,14 @@ after(){
         echo "start 20 rest 8"
         return 1
     fi
-    today=$(date +%Y-%m-%d)
-    future_date=$(date -d "$today +$1 days" +%Y-%m-%d)
+    
+    if [ -n "$2" ]; then
+        year=$(date +%Y)
+        base_date="$year-$2"
+    else
+        base_date=$(date +%Y-%m-%d)
+    fi
+    
+    future_date=$(date -d "$base_date +$1 days" +%Y-%m-%d)
     echo $future_date
 }
