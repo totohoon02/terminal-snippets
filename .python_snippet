@@ -8,6 +8,7 @@ venv(){
     fi
 
     pip install ruff
+    activate
 }
 
 activate(){
