@@ -30,7 +30,7 @@ freeze(){
 fast(){
 	venv
 	activate
-	pip install fastapi uvicorn ruff injector
+	pip install fastapi uvicorn ruff injector pytest
 	freeze
 
 	# gen dir
