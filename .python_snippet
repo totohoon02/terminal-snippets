@@ -113,6 +113,11 @@ fast(){
 	echo '        world = "hello!"' >> tests/test_sample.py
 	echo '        assert "hell" not in world' >> tests/test_sample.py
 
+	# __init__
+	echo '' > controller/__init__.py
+	echo '' > service/__init__.py
+	echo '' > service/inf/__init__.py
+
 	rr
 }
 run() {
