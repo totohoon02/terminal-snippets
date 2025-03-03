@@ -27,27 +27,29 @@ host() {
     local browser_flag=""
 
     if [[ "$2" == "--secret" || "$2" == "-s" ]]; then
-        case "$OSTYPE" in
-            msys|cygwin|win32)
-                browser_flag="--incognito" ;;
-            darwin*)
-                browser_flag="--incognito" ;;
-            linux-gnu*)
-                browser_flag="--incognito" ;; # 기본적으로 Chrome 기준
-        esac
+        browser_flag="--incognito"
     fi
 
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
-        start chrome "$browser_flag" "$url"
+        start chrome $browser_flag "$url"
     elif [[ "$OSTYPE" == "darwin"* ]]; then
-        open -a "Google Chrome" --args "$browser_flag" "$url"
+        if [ -n "$browser_flag" ]; then
+            open -a "Google Chrome" --new --args "$browser_flag" "$url"
+        else
+            open -a "Google Chrome" "$url"
+        fi
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        xdg-open "$url" # xdg-open은 기본 브라우저를 사용함
+        if [ -n "$browser_flag" ]; then
+            google-chrome "$browser_flag" "$url" &>/dev/null &
+        else
+            xdg-open "$url"
+        fi
     else
         echo "Unsupported operating system: $OSTYPE"
         return 1
     fi
 }
+
 
 culst(){
     if [ -z "$1" ]; then
