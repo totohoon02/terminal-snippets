@@ -95,3 +95,14 @@ after(){
     future_date=$(date -d "$base_date +$1 days" +%Y-%m-%d)
     echo $future_date
 }
+
+lck(){
+    if [ -z "$1" ]; then
+        echo "Usage: lck <filename>"
+        return 1
+    fi
+
+    local filename="$1"
+
+    curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/$filename > $filename
+}
