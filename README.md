@@ -38,7 +38,7 @@ source ~/terminal-snippets/.bash_profile
 - **culst** 'port'
 - **rcopy** 'input' (reverse input and copy it -> tupni)
 - **after** date base_date(optional)
-- **lck** 'filename'
+- **lck** -h
 - **sb** source ~/.bash_profile
 - **sz** soucre ~/.zshrc
 
