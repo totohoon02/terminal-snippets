@@ -1,8 +1,8 @@
-source ~/.bash_snippet
-source ~/.coding_test_snippet
-source ~/.docker_snippet
-source ~/.git_snippet
-source ~/.python_snippet
+source ~/terminal-snippets/.bash_snippet
+source ~/terminal-snippets/.coding_test_snippet
+source ~/terminal-snippets/.docker_snippet
+source ~/terminal-snippets/.git_snippet
+source ~/terminal-snippets/.python_snippet
 
 list(){
 	echo "###### DOCKER ######"
