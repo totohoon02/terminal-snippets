@@ -1,10 +1,11 @@
 # terminal-snippets
 
 ## How to use
+Clone Repository to your base url("~/")
 Include to .bash_profile / .zshrc <br>
 
 ```bash
-source ~/.python_snippet
+source ~/terminal-snippets/.bash_profile
 ```
 
 ## Combined >> '.bash_profile'
