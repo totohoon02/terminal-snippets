@@ -23,12 +23,19 @@ list(){
 	echo "fast"
 	echo "run <port>"
 	echo "db"
+	echo "pi <package>"
+	echo "pui <package>"
 	echo ""
 
 	echo "###### BASH COMMAND ######"
 	echo "pk <port>"
 	echo "host <port>"
-	echo "cost <port>"
+	echo "culst <port>"
+	echo "rcopy <input>"
+	echo "after <num> <optional:mm-dd>"
+	echo "lck <filename>"
+	echo "sb"
+	echo "sz"
 	echo ""
 
 	echo "###### github COMMAND ######"
@@ -37,9 +44,6 @@ list(){
 
 	echo "###### util COMMAND ######"
 	echo ct
-	echo "rcopy <str>"
-	echo "after <num>"
-	echo "lck <filename>"
 	echo ""
 }
 

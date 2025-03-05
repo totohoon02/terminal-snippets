@@ -35,6 +35,7 @@ source ~/terminal-snippets/.bash_profile
 
 - **pk** 'port'
 - **host** 'port'
+- **culst** 'port'
 - **rcopy** 'input' (reverse input and copy it -> tupni)
 - **after** date base_date(optional)
 - **lck** 'filename'
