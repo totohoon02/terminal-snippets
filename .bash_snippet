@@ -106,3 +106,6 @@ lck(){
 
     curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/$filename > $filename
 }
+
+alias sb="source ~/.bash_profile"
+alias sz="source ~/.zshrc"

@@ -161,3 +161,6 @@ db(){
     echo 'from db import engine' >> main.py
     echo 'models.Base.metadata.create_all(bind=engine)' >> main.py
 }
+
+alias pi="pip install"
+alias pui="pip uninstall"
