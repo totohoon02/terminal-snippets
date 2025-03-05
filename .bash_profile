@@ -13,6 +13,7 @@ list(){
 	echo "build <image:dev>"
 	echo "rmi"
 	echo ""
+
 	echo "###### PYTHON ######"
 	echo "venv <py:version>"
 	echo "activate"
@@ -23,18 +24,23 @@ list(){
 	echo "run <port>"
 	echo "db"
 	echo ""
+
 	echo "###### BASH COMMAND ######"
 	echo "pk <port>"
 	echo "host <port>"
 	echo "cost <port>"
 	echo ""
+
 	echo "###### github COMMAND ######"
 	echo "ignore <language>"
 	echo ""
+
 	echo "###### util COMMAND ######"
 	echo ct
 	echo "rcopy <str>"
 	echo "after <num>"
+	echo "lck <filename>"
+	echo ""
 }
 
 
