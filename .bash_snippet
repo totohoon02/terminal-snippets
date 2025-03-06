@@ -130,9 +130,8 @@ lck(){
             return 1
         else
             local dir="$2"
-            echo "$dir"
             mkdir "$dir"
-            curl https://github.com/totohoon02/locker/blob/main/docker/$dir/docker-compose.yml >> ./"$dir"/docker-compose.yml
+            curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/docker/$dir/docker-compose.yml >> ./"$dir"/docker-compose.yml
         fi
     else
         curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/"$1" >> "$1" 
