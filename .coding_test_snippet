@@ -13,4 +13,11 @@ ct(){
     echo '' >> codingTest.py
     echo 'def assertEqual(a, b):' >> codingTest.py
     echo '    assert a == b' >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'def sol():' >> codingTest.py
+    echo '    'pass >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'sol()' >> codingTest.py
 }

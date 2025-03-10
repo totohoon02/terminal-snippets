@@ -33,6 +33,11 @@ jdocker() {
     echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
 }
 
+recon(){
+    down
+    up --build
+}
+
 build(){
     docker build -t "$@" .
 }
