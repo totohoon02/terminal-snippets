@@ -27,7 +27,9 @@ source ~/terminal-snippets/.bash_profile
 
 - **up**
 - **down**
+- **recon** down up --build
 - **pydocker** (basic python Docker file)
+- **jdocker**
 - **build** 'image:dev'
 - **rmi** (remove danglings)
 
@@ -38,7 +40,7 @@ source ~/terminal-snippets/.bash_profile
 - **culst** 'port'
 - **rcopy** 'input' (reverse input and copy it -> tupni)
 - **after** date base_date(optional)
-- **lck** -h
+- **lck** -d(optional) filename
 - **sb** source ~/.bash_profile
 - **sz** soucre ~/.zshrc
 
