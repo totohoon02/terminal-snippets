@@ -6,9 +6,9 @@ venv(){
     else
         python$version -m venv .venv
     fi
+    activate
 
     pip install ruff
-    activate
 }
 
 activate(){
