@@ -69,6 +69,9 @@ fast(){
 	echo '' >> config/configuration.ini
 	echo '[PROD]' >> config/configuration.ini
 	echo 'host = prodhost' >> config/configuration.ini
+	echo '' >> config/configuration.ini
+	echo '[COMMON]' >> config/configuration.ini
+	echo 'model = mymodel' >> config/configuration.ini
 
 	# configurator
 	echo 'import configparser' > config/configurator.py
@@ -81,8 +84,12 @@ fast(){
 	echo '' >> config/configurator.py
 	echo '        self.configs = self.parser[self.env]' >> config/configurator.py
 	echo '' >> config/configurator.py
-	echo '    def get(self, key: str):' >> config/configurator.py
-	echo '        return self.configs[key]' >> config/configurator.py
+	echo '    def get_env(self, key: str):' >> config/configurator.py
+	echo '        return self.parser[self.env][key]' >> config/configurator.py
+	echo '' >> config/configurator.py
+	echo '    def get_common(self, key: str):' >> config/configurator.py
+	echo '        return self.parser["COMMON"][key]' >> config/configurator.py
+	echo '' >> config/configurator.py
 
 	# sample controller
 	echo 'from fastapi import APIRouter' > controller/sampleController.py
@@ -150,6 +157,7 @@ fast(){
 	lck ruff.toml
 	rr
 }
+
 run() {
     port=${1:-8000}
     uvicorn main:app --reload --port=$port
