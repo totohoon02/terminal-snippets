@@ -32,7 +32,7 @@ freeze(){
 fast(){
 	venv
 	activate
-	pip install fastapi uvicorn ruff injector pytest
+	pip install fastapi uvicorn injector pytest python-dotenv
 	freeze
 
 	# gen dir
@@ -41,6 +41,9 @@ fast(){
 	mkdir service/inf
 	mkdir tests
 	mkdir config
+
+	# .env
+	echo '# Store Secret Value here. Not configuration.ini' > .env
 
 	# DI Config
 	echo 'from injector import Injector, Module, singleton, provider' > config/depends.py
@@ -159,7 +162,6 @@ fast(){
 	echo '' > service/inf/__init__.py
 	echo '' > config/__init__.py
 
-	lck ruff.toml
 	rr
 }
 
