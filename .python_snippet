@@ -9,6 +9,8 @@ venv(){
     activate
 
     pip install ruff
+	lck ruff.toml
+	rr
 }
 
 activate(){
