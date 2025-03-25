@@ -38,29 +38,55 @@ fast(){
 	mkdir service
 	mkdir service/inf
 	mkdir tests
+	mkdir config
 
 	# DI Config
-	echo 'from injector import Injector, Module, singleton, provider' > config.py
-	echo '' >> config.py
-	echo '# inf' >> config.py
-	echo 'from service.inf.sampleService import SampleService' >> config.py
-	echo '' >> config.py
-	echo '# static' >> config.py
-	echo 'from service.sampleServiceImpl import SampleServiceImpl' >> config.py
-	echo '' >> config.py
-	echo '' >> config.py
-	echo 'class ServiceModule(Module):' >> config.py
-	echo '    @singleton' >> config.py
-	echo '    @provider' >> config.py
-	echo '    def sampleService(self) -> SampleService:' >> config.py
-	echo '        return SampleServiceImpl()' >> config.py
-	echo '' >> config.py
-	echo '' >> config.py
-	echo 'injector = Injector([ServiceModule()])' >> config.py
+	echo 'from injector import Injector, Module, singleton, provider' > config/depends.py
+	echo '' >> config/depends.py
+	echo '# inf' >> config/depends.py
+	echo 'from config.configurator import Configurator' >> config/depends.py
+	echo 'from service.inf.sampleService import SampleService' >> config/depends.py
+	echo '' >> config/depends.py
+	echo '# static' >> config/depends.py
+	echo 'from service.sampleServiceImpl import SampleServiceImpl' >> config/depends.py
+	echo '' >> config/depends.py
+	echo '' >> config/depends.py
+	echo 'class ServiceModule(Module):' >> config/depends.py
+	echo '    @singleton' >> config/depends.py
+	echo '    @provider' >> config/depends.py
+	echo '    def sampleService(self, configurator: Configurator) -> SampleService:' >> config/depends.py
+	echo '        return SampleServiceImpl(configurator)' >> config/depends.py
+	echo '' >> config/depends.py
+	echo '' >> config/depends.py
+	echo 'injector = Injector([ServiceModule()])' >> config/depends.py
+
+	# configParser
+	echo '[ENV]' > config/configuration.ini
+	echo 'env = DEV' >> config/configuration.ini
+	echo '' >> config/configuration.ini
+	echo '[DEV]' >> config/configuration.ini
+	echo 'host = localhost' >> config/configuration.ini
+	echo '' >> config/configuration.ini
+	echo '[PROD]' >> config/configuration.ini
+	echo 'host = prodhost' >> config/configuration.ini
+
+	# configurator
+	echo 'import configparser' > config/configurator.py
+	echo '' >> config/configurator.py
+	echo 'class Configurator:' >> config/configurator.py
+	echo '    def __init__(self):' >> config/configurator.py
+	echo '        self.parser = configparser.ConfigParser()' >> config/configurator.py
+	echo '        self.parser.read("config/configuration.ini")' >> config/configurator.py
+	echo '        self.env = self.parser["ENV"]["env"]' >> config/configurator.py
+	echo '' >> config/configurator.py
+	echo '        self.configs = self.parser[self.env]' >> config/configurator.py
+	echo '' >> config/configurator.py
+	echo '    def get(self, key: str):' >> config/configurator.py
+	echo '        return self.configs[key]' >> config/configurator.py
 
 	# sample controller
 	echo 'from fastapi import APIRouter' > controller/sampleController.py
-	echo 'from config import injector' >> controller/sampleController.py
+	echo 'from config.depends import injector' >> controller/sampleController.py
 	echo 'from service.inf.sampleService import SampleService' >> controller/sampleController.py
 	echo '' >> controller/sampleController.py
 	echo 'router = APIRouter(prefix="/hello", tags=["hello"])' >> controller/sampleController.py
@@ -83,15 +109,17 @@ fast(){
 	echo '        pass' >> service/inf/sampleService.py
 
 	# sample serviceImpl
-	echo 'from .inf.sampleService import SampleService' > service/sampleServiceImpl.py
+	echo 'from config.configurator import Configurator' > service/sampleServiceImpl.py
+	echo ''
+	echo 'from .inf.sampleService import SampleService' >> service/sampleServiceImpl.py
 	echo '' >> service/sampleServiceImpl.py
 	echo '' >> service/sampleServiceImpl.py
 	echo 'class SampleServiceImpl(SampleService):' >> service/sampleServiceImpl.py
-	echo '    def __init__(self):' >> service/sampleServiceImpl.py
-	echo '        super().__init__()' >> service/sampleServiceImpl.py
+	echo '    def __init__(self, configurator: Configurator):' >> service/sampleServiceImpl.py
+	echo '        self.configurator = configurator' >> service/sampleServiceImpl.py
 	echo '' >> service/sampleServiceImpl.py
 	echo '    def hello(self):' >> service/sampleServiceImpl.py
-	echo '        return {"Hello": "World!"}' >> service/sampleServiceImpl.py
+	echo '        return {"host": self.configurator.get("host")}' >> service/sampleServiceImpl.py
 
 	# main.py
 	echo 'from fastapi import FastAPI' > main.py
@@ -117,7 +145,9 @@ fast(){
 	echo '' > controller/__init__.py
 	echo '' > service/__init__.py
 	echo '' > service/inf/__init__.py
+	echo '' > config/__init__.py
 
+	lck ruff.toml
 	rr
 }
 run() {
