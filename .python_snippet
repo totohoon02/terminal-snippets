@@ -90,6 +90,9 @@ fast(){
 	echo '    def get_common(self, key: str):' >> config/configurator.py
 	echo '        return self.parser["COMMON"][key]' >> config/configurator.py
 	echo '' >> config/configurator.py
+	echo '    def get_section(self, section: str, key: str):' >> config/configurator.py
+	echo '        return self.parser[section][key]' >> config/configurator.py
+	echo '' >> config/configurator.py
 
 	# sample controller
 	echo 'from fastapi import APIRouter' > controller/sampleController.py
