@@ -113,6 +113,9 @@ lck(){
         echo "         |--airflow"
         echo "         |--mysql"
         echo "         |--mongodb"
+        echo "         |--n8n"
+        echo "         |--kafka"
+        echo "         |--postgre"
         echo ""
         echo "##### Usage #####"
         echo "lck chromaConfig.yml"
@@ -132,11 +135,12 @@ lck(){
             return 1
         else
             local dir="$2"
+            echo "$dir"
             mkdir "$dir"
-            curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/docker/$dir/docker-compose.yml > ./"$dir"/docker-compose.yml
+            curl https://github.com/totohoon02/locker/blob/main/docker/$dir/docker-compose.yml >> ./"$dir"/docker-compose.yml
         fi
     else
-        curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/"$1" > "$1" 
+        curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/"$1" >> "$1" 
     fi
 }
 
