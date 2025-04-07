@@ -165,6 +165,59 @@ fast(){
 	rr
 }
 
+mvc(){
+	mdName="$1"
+
+    if [ -z "$mdName" ]; then
+        echo "❌ 모듈이름이 비어 있습니다."
+        return 1
+    fi
+
+    upperName="$(echo "${mdName:0:1}" | tr '[:lower:]' '[:upper:]')${mdName:1}"
+    lowerName="$(echo "$mdName" | tr '[:upper:]' '[:lower:]')"
+
+	# controller
+	echo "from fastapi import APIRouter" > controller/${lowerName}Controller.py
+	echo "from config.depends import injector" >> controller/${lowerName}Controller.py
+	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> controller/${lowerName}Controller.py
+	echo "" >> controller/${lowerName}Controller.py
+	echo "router = APIRouter(prefix='/hello', tags=['${lowerName}'])" >> controller/${lowerName}Controller.py
+	echo "" >> controller/${lowerName}Controller.py
+	echo "# service" >> controller/${lowerName}Controller.py
+	echo "${lowerName}Service = injector.get(${upperName}Service)" >> controller/${lowerName}Controller.py
+	echo "" >> controller/${lowerName}Controller.py
+	echo "" >> controller/${lowerName}Controller.py
+	echo "@router.get("")" >> controller/${lowerName}Controller.py
+	echo "def hello():" >> controller/${lowerName}Controller.py
+	echo "	return ${lowerName}Service.hello()" >> controller/${lowerName}Controller.py
+
+	# service - inf
+	echo "from abc import ABC, abstractmethod" > service/inf/${lowerName}Service.py
+	echo "" >> service/inf/${lowerName}Service.py
+	echo "" >> service/inf/${lowerName}Service.py
+	echo "class ${upperName}Service(ABC):" >> service/inf/${lowerName}Service.py
+	echo "	@abstractmethod" >> service/inf/${lowerName}Service.py
+	echo "	def hello(self):" >> service/inf/${lowerName}Service.py
+	echo "		pass" >> service/inf/${lowerName}Service.py
+
+	# service
+	echo "from config.configurator import Configurator" > service/${lowerName}ServiceImpl.py
+	echo "from .inf.theClimbService import TheClimbService" >> service/${lowerName}ServiceImpl.py
+	echo "" >> service/${lowerName}ServiceImpl.py
+	echo "" >> service/${lowerName}ServiceImpl.py
+	echo "class TheClimbServiceImpl(TheClimbService):" >> service/${lowerName}ServiceImpl.py
+	echo "	def __init__(self, configurator: Configurator):" >> service/${lowerName}ServiceImpl.py
+	echo "		self.configurator = configurator" >> service/${lowerName}ServiceImpl.py
+	echo "" >> service/${lowerName}ServiceImpl.py
+	echo "	def hello(self):" >> service/${lowerName}ServiceImpl.py
+	echo "		return {'host': self.configurator.get('host')}" >> service/${lowerName}ServiceImpl.py
+
+
+
+
+
+}
+
 run() {
     port=${1:-8000}
     uvicorn main:app --reload --port=$port
