@@ -41,6 +41,7 @@ fast(){
 	mkdir service/inf
 	mkdir tests
 	mkdir config
+	mkdir model
 	mkdir module
 	mkdir module/modules
 
@@ -70,64 +71,65 @@ fast(){
 	echo "injector = Injector(serviceModuels)" >> module/depends.py
 
 	# configParser
-	echo '[ENV]' > config/configuration.ini
-	echo 'env = DEV' >> config/configuration.ini
-	echo '' >> config/configuration.ini
-	echo '[DEV]' >> config/configuration.ini
-	echo 'host = localhost' >> config/configuration.ini
-	echo '' >> config/configuration.ini
-	echo '[PROD]' >> config/configuration.ini
-	echo 'host = prodhost' >> config/configuration.ini
-	echo '' >> config/configuration.ini
-	echo '[COMMON]' >> config/configuration.ini
-	echo 'model = mymodel' >> config/configuration.ini
+	echo "[ENV]" > config/configuration.ini
+	echo "env = DEV" >> config/configuration.ini
+	echo "" >> config/configuration.ini
+	echo "[DEV]" >> config/configuration.ini
+	echo "host = localhost" >> config/configuration.ini
+	echo "" >> config/configuration.ini
+	echo "[PROD]" >> config/configuration.ini
+	echo "host = prodhost" >> config/configuration.ini
+	echo "" >> config/configuration.ini
+	echo "[COMMON]" >> config/configuration.ini
+	echo "model = mymodel" >> config/configuration.ini
 
 	# configurator
-	echo 'import configparser' > config/configurator.py
-	echo '' >> config/configurator.py
-	echo 'class Configurator:' >> config/configurator.py
-	echo '    def __init__(self):' >> config/configurator.py
-	echo '        self.parser = configparser.ConfigParser()' >> config/configurator.py
-	echo '        self.parser.read("config/configuration.ini")' >> config/configurator.py
-	echo '        self.env = self.parser["ENV"]["env"]' >> config/configurator.py
-	echo '' >> config/configurator.py
-	echo '        self.configs = self.parser[self.env]' >> config/configurator.py
-	echo '' >> config/configurator.py
-	echo '    def get_env(self, key: str):' >> config/configurator.py
-	echo '        return self.parser[self.env][key]' >> config/configurator.py
-	echo '' >> config/configurator.py
-	echo '    def get_common(self, key: str):' >> config/configurator.py
-	echo '        return self.parser["COMMON"][key]' >> config/configurator.py
-	echo '' >> config/configurator.py
-	echo '    def get_section(self, section: str, key: str):' >> config/configurator.py
-	echo '        return self.parser[section][key]' >> config/configurator.py
-	echo '' >> config/configurator.py
+	echo "import configparser" > config/configurator.py
+	echo "" >> config/configurator.py
+	echo "class Configurator:" >> config/configurator.py
+	echo "    def __init__(self):" >> config/configurator.py
+	echo "        self.parser = configparser.ConfigParser()" >> config/configurator.py
+	echo "        self.parser.read('config/configuration.ini')" >> config/configurator.py
+	echo "        self.env = self.parser['ENV']['env']" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        self.configs = self.parser[self.env]" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "    def get_env(self, key: str):" >> config/configurator.py
+	echo "        return self.parser[self.env][key]" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "    def get_common(self, key: str):" >> config/configurator.py
+	echo "        return self.parser["COMMON"][key]" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "    def get_section(self, section: str, key: str):" >> config/configurator.py
+	echo "        return self.parser[section][key]" >> config/configurator.py
+	echo "" >> config/configurator.py
 
 	# main.py
-	echo 'from fastapi import FastAPI' > main.py
-	echo '' >> main.py
-	echo 'app = FastAPI()' >> main.py
-	echo '' >> main.py
+	echo "from fastapi import FastAPI" > main.py
+	echo "" >> main.py
+	echo "app = FastAPI()" >> main.py
+	echo "" >> main.py
 
 	# sample test
-	echo 'class Test_SampleService:' > tests/test_sample.py
-	echo '    # this will be succeeded' >> tests/test_sample.py
-	echo '    def test_hello_success(self):' >> tests/test_sample.py
-	echo '        world = "hello!"' >> tests/test_sample.py
-	echo '        assert "hell" in world' >> tests/test_sample.py
-	echo '' >> tests/test_sample.py
-	echo '    # this will be failed' >> tests/test_sample.py
-	echo '    def test_hello_fail(self):' >> tests/test_sample.py
-	echo '        world = "hello!"' >> tests/test_sample.py
-	echo '        assert "hell" not in world' >> tests/test_sample.py
+	echo "class Test_SampleService:" > tests/test_sample.py
+	echo "    # this will be succeeded" >> tests/test_sample.py
+	echo "    def test_hello_success(self):" >> tests/test_sample.py
+	echo "        world = 'hello!'" >> tests/test_sample.py
+	echo "        assert 'hell' in world" >> tests/test_sample.py
+	echo "" >> tests/test_sample.py
+	echo "    # this will be failed" >> tests/test_sample.py
+	echo "    def test_hello_fail(self):" >> tests/test_sample.py
+	echo "        world = 'hello!'" >> tests/test_sample.py
+	echo "        assert 'hell' not in world" >> tests/test_sample.py
 
 	# __init__
-	echo '' > controller/__init__.py
-	echo '' > service/__init__.py
-	echo '' > service/inf/__init__.py
-	echo '' > config/__init__.py
-	echo '' > module/__init__.py
-	echo '' > module/modules/__init__.py
+	echo "" > controller/__init__.py
+	echo "" > service/__init__.py
+	echo "" > service/inf/__init__.py
+	echo "" > config/__init__.py
+	echo "" > model/__init__.py
+	echo "" > module/__init__.py
+	echo "" > module/modules/__init__.py
 
 	rr
 }
@@ -214,31 +216,31 @@ db(){
     pip install sqlalchemy
 
     # create db.py
-    echo 'from sqlalchemy import create_engine' > db.py
-    echo 'from sqlalchemy.ext.declarative import declarative_base' >> db.py
-    echo 'from sqlalchemy.orm import sessionmaker' >> db.py
-    echo '' >> db.py
-    echo 'SQLALCHEMY_DATABASE_URL = "sqlite:///./mydb.db"' >> db.py
-    echo '' >> db.py
-    echo 'engine = create_engine(' >> db.py
-    echo '    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}' >> db.py
-    echo ')' >> db.py
-    echo '' >> db.py
-    echo 'SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)' >> db.py
-    echo '' >> db.py
-    echo 'Base = declarative_base()' >> db.py
+    echo "from sqlalchemy import create_engine" > db.py
+    echo "from sqlalchemy.ext.declarative import declarative_base" >> db.py
+    echo "from sqlalchemy.orm import sessionmaker" >> db.py
+    echo "" >> db.py
+    echo "SQLALCHEMY_DATABASE_URL = 'sqlite:///./mydb.db'" >> db.py
+    echo "" >> db.py
+    echo "engine = create_engine(" >> db.py
+    echo "    SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False}" >> db.py
+    echo ")" >> db.py
+    echo "" >> db.py
+    echo "SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)" >> db.py
+    echo "" >> db.py
+    echo "Base = declarative_base()" >> db.py
 
     # create models.py
     
-    echo 'from db import Base' > models.py
-    echo '' >> models.py
-    echo 'class DummyModel(Base):' >> models.py
-    echo '    pass' >> models.py
+    echo "from db import Base" > model/models.py
+    echo "" >> model/models.py
+    echo "class DummyModel(Base):" >> model/models.py
+    echo "    pass" >> model/models.py
     
     # main.py
-    echo 'import models' >> main.py
-    echo 'from db import engine' >> main.py
-    echo 'models.Base.metadata.create_all(bind=engine)' >> main.py
+    echo "from model.models import models" >> main.py
+    echo "from db import engine" >> main.py
+    echo "models.Base.metadata.create_all(bind=engine)" >> main.py
 }
 
 alias pi="pip install"
