@@ -118,8 +118,8 @@ lck(){
         echo "         |--postgre"
         echo ""
         echo "##### Usage #####"
-        echo "lck chromaConfig.yml"
-        echo "lck -d chromadb"
+        echo "lck chroma"       // chromaConfig.yml
+        echo "lck -d chromadb"  // chroma docker-compose.yml
         echo "##### Usage #####"
         return 1
     fi
@@ -135,12 +135,13 @@ lck(){
             return 1
         else
             local dir="$2"
-            echo "$dir"
             mkdir "$dir"
             curl https://github.com/totohoon02/locker/blob/main/docker/$dir/docker-compose.yml >> ./"$dir"/docker-compose.yml
         fi
     else
-        curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/"$1" >> "$1" 
+        local dir="$1"
+        dir=$(echo "$dir" | tr '[:upper:]' '[:lower:]')
+        curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/"$1"Config.yml >> "$1"Config.yml 
     fi
 }
 
