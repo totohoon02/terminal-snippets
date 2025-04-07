@@ -18,6 +18,7 @@ source ~/terminal-snippets/.bash_profile
 - **requirements** (install requirements)
 - **freeze**
 - **fast** (fastapi setup)
+- **mvc** (add controller, service, dpendency)
 - **run** 'port'
 - **db** (sqlalchemy setup)
 - **pi** pip install

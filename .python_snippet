@@ -41,29 +41,33 @@ fast(){
 	mkdir service/inf
 	mkdir tests
 	mkdir config
+	mkdir module
+	mkdir module/modules
 
 	# .env
 	echo '# Store Secret Value here. Not configuration.ini' > .env
 
 	# DI Config
-	echo 'from injector import Injector, Module, singleton, provider' > config/depends.py
-	echo '' >> config/depends.py
-	echo '# inf' >> config/depends.py
-	echo 'from config.configurator import Configurator' >> config/depends.py
-	echo 'from service.inf.sampleService import SampleService' >> config/depends.py
-	echo '' >> config/depends.py
-	echo '# static' >> config/depends.py
-	echo 'from service.sampleServiceImpl import SampleServiceImpl' >> config/depends.py
-	echo '' >> config/depends.py
-	echo '' >> config/depends.py
-	echo 'class ServiceModule(Module):' >> config/depends.py
-	echo '    @singleton' >> config/depends.py
-	echo '    @provider' >> config/depends.py
-	echo '    def sampleService(self, configurator: Configurator) -> SampleService:' >> config/depends.py
-	echo '        return SampleServiceImpl(configurator)' >> config/depends.py
-	echo '' >> config/depends.py
-	echo '' >> config/depends.py
-	echo 'injector = Injector([ServiceModule()])' >> config/depends.py
+	echo "import inspect" > module/depends.py
+	echo "import pkgutil" >> module/depends.py
+	echo "import importlib" >> module/depends.py
+	echo "from module import modules" >> module/depends.py
+	echo "from injector import Injector, Module" >> module/depends.py
+	echo "" >> module/depends.py
+	echo "serviceModuels = []" >> module/depends.py
+	echo "" >> module/depends.py
+	echo "for _, name, is_pkg in pkgutil.iter_modules(modules.__path__):" >> module/depends.py
+	echo "    if is_pkg:" >> module/depends.py
+	echo "        continue" >> module/depends.py
+	echo ""
+	echo "    full_module_name = f'{modules.__name__}.{name}'" >> module/depends.py
+	echo "    module = importlib.import_module(full_module_name)" >> module/depends.py
+	echo ""
+	echo "    for attr_name, cls in inspect.getmembers(module, inspect.isclass):" >> module/depends.py
+	echo "        if issubclass(cls, Module) and cls is not Module and not inspect.isabstract(cls):" >> module/depends.py
+	echo "            serviceModuels.append(cls())" >> module/depends.py
+	echo "" >> module/depends.py
+	echo "injector = Injector(serviceModuels)" >> module/depends.py
 
 	# configParser
 	echo '[ENV]' > config/configuration.ini
@@ -99,50 +103,11 @@ fast(){
 	echo '        return self.parser[section][key]' >> config/configurator.py
 	echo '' >> config/configurator.py
 
-	# sample controller
-	echo 'from fastapi import APIRouter' > controller/sampleController.py
-	echo 'from config.depends import injector' >> controller/sampleController.py
-	echo 'from service.inf.sampleService import SampleService' >> controller/sampleController.py
-	echo '' >> controller/sampleController.py
-	echo 'router = APIRouter(prefix="/hello", tags=["hello"])' >> controller/sampleController.py
-	echo '' >> controller/sampleController.py
-	echo '# service' >> controller/sampleController.py
-	echo 'sampleService = injector.get(SampleService)' >> controller/sampleController.py
-	echo '' >> controller/sampleController.py
-	echo '' >> controller/sampleController.py
-	echo '@router.get("")' >> controller/sampleController.py
-	echo 'def hello():' >> controller/sampleController.py
-	echo '    return sampleService.hello()' >> controller/sampleController.py
-
-	# sample service
-	echo 'from abc import ABC, abstractmethod' > service/inf/sampleService.py
-	echo '' >> service/inf/sampleService.py
-	echo '' >> service/inf/sampleService.py
-	echo 'class SampleService(ABC):' >> service/inf/sampleService.py
-	echo '    @abstractmethod' >> service/inf/sampleService.py
-	echo '    def hello(self):' >> service/inf/sampleService.py
-	echo '        pass' >> service/inf/sampleService.py
-
-	# sample serviceImpl
-	echo 'from config.configurator import Configurator' > service/sampleServiceImpl.py
-	echo ''
-	echo 'from .inf.sampleService import SampleService' >> service/sampleServiceImpl.py
-	echo '' >> service/sampleServiceImpl.py
-	echo '' >> service/sampleServiceImpl.py
-	echo 'class SampleServiceImpl(SampleService):' >> service/sampleServiceImpl.py
-	echo '    def __init__(self, configurator: Configurator):' >> service/sampleServiceImpl.py
-	echo '        self.configurator = configurator' >> service/sampleServiceImpl.py
-	echo '' >> service/sampleServiceImpl.py
-	echo '    def hello(self):' >> service/sampleServiceImpl.py
-	echo '        return {"host": self.configurator.get("host")}' >> service/sampleServiceImpl.py
-
 	# main.py
 	echo 'from fastapi import FastAPI' > main.py
-	echo 'from controller import sampleController' >> main.py
 	echo '' >> main.py
 	echo 'app = FastAPI()' >> main.py
 	echo '' >> main.py
-	echo 'app.include_router(sampleController.router)' >> main.py
 
 	# sample test
 	echo 'class Test_SampleService:' > tests/test_sample.py
@@ -161,6 +126,8 @@ fast(){
 	echo '' > service/__init__.py
 	echo '' > service/inf/__init__.py
 	echo '' > config/__init__.py
+	echo '' > module/__init__.py
+	echo '' > module/modules/__init__.py
 
 	rr
 }
@@ -173,12 +140,12 @@ mvc(){
         return 1
     fi
 
-    upperName="$(echo "${mdName:0:1}" | tr '[:lower:]' '[:upper:]')${mdName:1}"
-    lowerName="$(echo "$mdName" | tr '[:upper:]' '[:lower:]')"
+	upperName="$(echo "${mdName:0:1}" | tr '[:lower:]' '[:upper:]')${mdName:1}"
+	lowerName="$(echo "${mdName:0:1}" | tr '[:upper:]' '[:lower:]')${mdName:1}"
 
 	# controller
 	echo "from fastapi import APIRouter" > controller/${lowerName}Controller.py
-	echo "from config.depends import injector" >> controller/${lowerName}Controller.py
+	echo "from module.depends import injector" >> controller/${lowerName}Controller.py
 	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
 	echo "router = APIRouter(prefix='/hello', tags=['${lowerName}'])" >> controller/${lowerName}Controller.py
@@ -187,7 +154,7 @@ mvc(){
 	echo "${lowerName}Service = injector.get(${upperName}Service)" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
-	echo "@router.get("")" >> controller/${lowerName}Controller.py
+	echo "@router.get('')" >> controller/${lowerName}Controller.py
 	echo "def hello():" >> controller/${lowerName}Controller.py
 	echo "	return ${lowerName}Service.hello()" >> controller/${lowerName}Controller.py
 
@@ -200,21 +167,35 @@ mvc(){
 	echo "	def hello(self):" >> service/inf/${lowerName}Service.py
 	echo "		pass" >> service/inf/${lowerName}Service.py
 
-	# service
+	# service - Impl
 	echo "from config.configurator import Configurator" > service/${lowerName}ServiceImpl.py
-	echo "from .inf.theClimbService import TheClimbService" >> service/${lowerName}ServiceImpl.py
+	echo "from .inf.${lowerName}Service import ${upperName}Service" >> service/${lowerName}ServiceImpl.py
 	echo "" >> service/${lowerName}ServiceImpl.py
 	echo "" >> service/${lowerName}ServiceImpl.py
-	echo "class TheClimbServiceImpl(TheClimbService):" >> service/${lowerName}ServiceImpl.py
+	echo "class ${upperName}ServiceImpl(${upperName}Service):" >> service/${lowerName}ServiceImpl.py
 	echo "	def __init__(self, configurator: Configurator):" >> service/${lowerName}ServiceImpl.py
 	echo "		self.configurator = configurator" >> service/${lowerName}ServiceImpl.py
 	echo "" >> service/${lowerName}ServiceImpl.py
 	echo "	def hello(self):" >> service/${lowerName}ServiceImpl.py
 	echo "		return {'host': self.configurator.get('host')}" >> service/${lowerName}ServiceImpl.py
 
+	# injector
+	echo "from injector import Module, singleton, provider" > module/modules/${lowerName}Module.py
+	echo "from config.configurator import Configurator" >> module/modules/${lowerName}Module.py
+	echo "" >> module/modules/${lowerName}Module.py
+	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> module/modules/${lowerName}Module.py
+	echo "from service.${lowerName}ServiceImpl import ${upperName}ServiceImpl" >> module/modules/${lowerName}Module.py
+	echo "" >> module/modules/${lowerName}Module.py
+	echo "" >> module/modules/${lowerName}Module.py
+	echo "class ${upperName}Module(Module):" >> module/modules/${lowerName}Module.py
+	echo "	@singleton" >> module/modules/${lowerName}Module.py
+	echo "	@provider" >> module/modules/${lowerName}Module.py
+	echo "	def ${lowerName}Service(self, configurator: Configurator) -> ${upperName}Service:" >> module/modules/${lowerName}Module.py
+	echo "		return ${upperName}ServiceImpl(configurator)" >> module/modules/${lowerName}Module.py
 
-
-
+	# main
+	echo "from controller import ${lowerName}Controller" >> main.py
+	echo "app.include_router(${lowerName}Controller.router)" >> main.py
 
 }
 
