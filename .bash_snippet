@@ -99,32 +99,7 @@ after(){
 lck(){
     # help
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-        echo "locker/"
-        echo "      |--chromaConfig.yml"
-        echo "      |--elasticConfig.yml"
-        echo "      |--ollamaConfig.yml"
-        echo "      |--sqliteConfig.yml"
-        echo "      |--swaggerConfig.yml"
-        echo "      |--ruff.toml"
-        echo "      |--docker"
-        echo "         |--chromadb"
-        echo "         |--elastic8"
-        echo "         |--nginx"
-        echo "         |--ollama"
-        echo "         |--airflow"
-        echo "         |--mysql"
-        echo "         |--mongodb"
-        echo "         |--n8n"
-        echo "         |--kafka"
-        echo "         |--postgre"
-        echo "      |--java"
-        echo "         |--SwaggerConfig.java"
-        echo ""
-        echo "##### Usage #####"
-        echo "lck chroma"       // chromaConfig.yml
-        echo "lck -d chromadb"  // chroma docker-compose.yml
-        echo "lck -j swagger"  // SwaggerConfig.java
-        echo "##### Usage #####"
+        curl https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main/help.txt
         return 1
     fi
 
