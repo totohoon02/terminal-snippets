@@ -2,11 +2,11 @@
 
 ## How to use
 
-Clone Repository to your base url("~/")
+Clone Repository to your home url("~/")
 Include to .bash_profile / .zshrc <br>
 
 ```bash
-source ~/terminal-snippets/.bash_profile
+source ./terminal-snippets/.bash_include
 ```
 
 ## Combined >> '.bash_profile'
@@ -30,18 +30,18 @@ source ~/terminal-snippets/.bash_profile
 - **down**
 - **recon** down up --build
 - **pydocker** (basic python Docker file)
-- **jdocker**
+- **jdocker** (basic java Docker file)
 - **build** 'image:dev'
 - **rmi** (remove danglings)
 
 ### bash
 
-- **pk** 'port'
-- **host** 'port'
-- **culst** 'port'
+- **pk** 'port' (kill port)
+- **host** 'port' (open localhost:port)
+- **culst** 'port' (curl localhost:port)
 - **rcopy** 'input' (reverse input and copy it -> tupni)
-- **after** date base_date(optional)
-- **lck** -d(optional) filename
+- **after** 'date base_date(optional)'
+- **lck** '-d(optional) filename'
 - **sb** source ~/.bash_profile
 - **sz** soucre ~/.zshrc
 
@@ -51,4 +51,5 @@ source ~/terminal-snippets/.bash_profile
 
 ### coding test util
 
-- **ct**
+- **ct** create file
+- **rct** run

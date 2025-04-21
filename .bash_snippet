@@ -79,22 +79,32 @@ rcopy(){
     fi
 }
 
-after(){
+after() {
+    if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+        echo "사용법: after <일수> [월-일]"
+        echo "예시:"
+        echo "  after 20           # 오늘 기준 20일 후 날짜 출력"
+        echo "  after 20 04-01     # 해당 연도 4월 1일 기준 20일 후 날짜 출력"
+        return 0
+    fi
+
     if [ -z "$1" ]; then
         echo "start 20 rest 8"
+        echo "날짜는 겹치게"
         return 1
     fi
-    
+
     if [ -n "$2" ]; then
         year=$(date +%Y)
         base_date="$year-$2"
     else
         base_date=$(date +%Y-%m-%d)
     fi
-    
+
     future_date=$(date -d "$base_date +$1 days" +%Y-%m-%d)
     echo $future_date
 }
+
 
 lck(){
     # get file
@@ -103,7 +113,7 @@ lck(){
     # help
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         curl $baseUrl/help.txt
-        return 1
+        return 0
     fi
 
     # No input    
