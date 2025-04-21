@@ -144,10 +144,18 @@ lck(){
         curl -sSL "$baseUrl/java/${dir}Config.java" -o "${dir}Config.java"
 
     # config.yml
+    elif [[ "$1" == "--yml" || "$1" == "-y" ]]; then
+        if [ -z "$2" ]; then
+            echo "Not specified yml"
+            return 1
+        fi
+        local dir="$2"
+        dir=$(echo "$dir" | tr '[:upper:]' '[:lower:]')
+        curl -sSL "$baseUrl/${dir}Config.yml" -o "${dir}Config.yml"
     else
         local dir="$1"
         dir=$(echo "$dir" | tr '[:upper:]' '[:lower:]')
-        curl -sSL "$baseUrl/${dir}Config.yml" -o "${dir}Config.yml"
+        curl -sSL "$baseUrl/${dir}" -o "${dir}"
     fi
 }
 
