@@ -87,6 +87,12 @@ fast(){
 	echo "import configparser" > config/configurator.py
 	echo "" >> config/configurator.py
 	echo "class Configurator:" >> config/configurator.py
+	echo "    \"\"\"" >> config/configurator.py
+	echo "    Configuration Manager" >> config/configurator.py
+	echo "    Get Configuration Value from 'configuration.ini'" >> config/configurator.py
+	echo "    \"Never change this file\"" >> config/configurator.py
+	echo "    \"\"\"" >> config/configurator.py
+	echo "" >> config/configurator.py
 	echo "    def __init__(self):" >> config/configurator.py
 	echo "        self.parser = configparser.ConfigParser()" >> config/configurator.py
 	echo "        self.parser.read('config/configuration.ini')" >> config/configurator.py
@@ -95,14 +101,43 @@ fast(){
 	echo "        self.configs = self.parser[self.env]" >> config/configurator.py
 	echo "" >> config/configurator.py
 	echo "    def get_env(self, key: str):" >> config/configurator.py
+	echo "        \"\"\"" >> config/configurator.py
+	echo "        Get Current Environment's Value" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        Args:" >> config/configurator.py
+	echo "            key (str): key" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        Returns:" >> config/configurator.py
+	echo "            str: value" >> config/configurator.py
+	echo "        \"\"\"" >> config/configurator.py
 	echo "        return self.parser[self.env][key]" >> config/configurator.py
 	echo "" >> config/configurator.py
 	echo "    def get_common(self, key: str):" >> config/configurator.py
-	echo "        return self.parser["COMMON"][key]" >> config/configurator.py
+	echo "        \"\"\"" >> config/configurator.py
+	echo "        Get 'Common' Configuration Value" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        Args:" >> config/configurator.py
+	echo "            key (str): key" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        Returns:" >> config/configurator.py
+	echo "            str: value" >> config/configurator.py
+	echo "        \"\"\"" >> config/configurator.py
+	echo "        return self.parser['COMMON'][key]" >> config/configurator.py
 	echo "" >> config/configurator.py
 	echo "    def get_section(self, section: str, key: str):" >> config/configurator.py
+	echo "        \"\"\"" >> config/configurator.py
+	echo "        Get Section Configuration Value" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        Args:" >> config/configurator.py
+	echo "            section (str): section(COMMON, DEV, PROD)" >> config/configurator.py
+	echo "            key (str): key" >> config/configurator.py
+	echo "" >> config/configurator.py
+	echo "        Returns:" >> config/configurator.py
+	echo "            str: value" >> config/configurator.py
+	echo "        \"\"\"" >> config/configurator.py
 	echo "        return self.parser[section][key]" >> config/configurator.py
 	echo "" >> config/configurator.py
+
 
 	# main.py
 	echo "from fastapi import FastAPI" > main.py
