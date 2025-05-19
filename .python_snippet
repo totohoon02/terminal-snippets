@@ -259,34 +259,41 @@ rr(){
 
 db(){
     # install package
-    pip install sqlalchemy
+    pip install sqlalchemy pymysql
 
     # create db.py
-    echo "from sqlalchemy import create_engine" > db.py
-    echo "from sqlalchemy.ext.declarative import declarative_base" >> db.py
-    echo "from sqlalchemy.orm import sessionmaker" >> db.py
-    echo "" >> db.py
-    echo "SQLALCHEMY_DATABASE_URL = 'sqlite:///./mydb.db'" >> db.py
-    echo "" >> db.py
-    echo "engine = create_engine(" >> db.py
-    echo "    SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False}" >> db.py
-    echo ")" >> db.py
-    echo "" >> db.py
-    echo "SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)" >> db.py
-    echo "" >> db.py
-    echo "Base = declarative_base()" >> db.py
+    echo 'from sqlalchemy import create_engine' > db.py
+	echo 'from sqlalchemy.ext.declarative import declarative_base' >> db.py
+	echo 'from sqlalchemy.orm import sessionmaker' >> db.py
+	echo 'from config.configurator import Configurator' >> db.py
+	echo '' >> db.py
+	echo '# 데이터베이스 연결 설정' >> db.py
+	echo 'DB_HOST = Configurator.get_env_value("db_host")' >> db.py
+	echo 'DB_USER = Configurator.get_env_value("db_user")' >> db.py
+	echo 'DB_PASSWORD = Configurator.get_env_value("db_password")' >> db.py
+	echo 'DB_NAME = Configurator.get_env_value("db_name")' >> db.py
+	echo '' >> db.py
+	echo '# SQLAlchemy 엔진 생성' >> db.py
+	echo 'DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"' >> db.py
+	echo 'engine = create_engine(DATABASE_URL)' >> db.py
+	echo '' >> db.py
+	echo '# 세션 생성' >> db.py
+	echo 'SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)' >> db.py
+	echo '' >> db.py
+	echo '# Base 클래스 생성' >> db.py
+	echo 'Base = declarative_base()' >> db.py
+	echo '' >> db.py
+	echo '# 데이터베이스 세션 가져오기' >> db.py
+	echo 'def get_db():' >> db.py
+	echo '    db = SessionLocal()' >> db.py
+	echo '    try:' >> db.py
+	echo '        yield db' >> db.py
+	echo '    finally:' >> db.py
+	echo '        db.close()' >> db.py
 
-    # create models.py
-    
-    echo "from db import Base" > model/models.py
-    echo "" >> model/models.py
-    echo "class DummyModel(Base):" >> model/models.py
-    echo "    pass" >> model/models.py
-    
     # main.py
-    echo "from model.models import models" >> main.py
-    echo "from db import engine" >> main.py
-    echo "models.Base.metadata.create_all(bind=engine)" >> main.py
+    echo "from db import engine, Base" >> main.py
+    echo "Base.metadata.create_all(bind=engine)" >> main.py
 }
 
 alias pi="pip install"
