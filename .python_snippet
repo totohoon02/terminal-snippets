@@ -71,20 +71,21 @@ fast(){
 	echo "injector = Injector(serviceModuels)" >> module/depends.py
 
 	# configParser
-	echo "[ENV]" > config/configuration.ini
-	echo "env = DEV" >> config/configuration.ini
-	echo "" >> config/configuration.ini
-	echo "[DEV]" >> config/configuration.ini
-	echo "host = localhost" >> config/configuration.ini
-	echo "" >> config/configuration.ini
-	echo "[PROD]" >> config/configuration.ini
-	echo "host = prodhost" >> config/configuration.ini
-	echo "" >> config/configuration.ini
-	echo "[COMMON]" >> config/configuration.ini
-	echo "model = mymodel" >> config/configuration.ini
+	echo "[ENV]" > configuration.ini
+	echo "env = DEV" >> configuration.ini
+	echo "" >> configuration.ini
+	echo "[DEV]" >> configuration.ini
+	echo "host = localhost" >> configuration.ini
+	echo "" >> configuration.ini
+	echo "[PROD]" >> configuration.ini
+	echo "host = prodhost" >> configuration.ini
+	echo "" >> configuration.ini
+	echo "[COMMON]" >> configuration.ini
+	echo "model = mymodel" >> configuration.ini
 
 	# configurator
-	echo "import configparser" > config/configurator.py
+	echo "import os" > config/configurator.py
+	echo "import configparser" >> config/configurator.py
 	echo "" >> config/configurator.py
 	echo "class Configurator:" >> config/configurator.py
 	echo "	\"\"\"" >> config/configurator.py
@@ -95,8 +96,12 @@ fast(){
 	echo "" >> config/configurator.py
 	echo "	@staticmethod" >> config/configurator.py
 	echo "	def __get_parser():" >> config/configurator.py
+	echo "		base_dir = os.path.dirname(os.path.abspath(__file__))" >> config/configurator.py
+	echo "		config_path = os.path.join(base_dir, '..', 'configuration.ini')" >> config/configurator.py
+	echo "		config_path = os.path.abspath(config_path)" >> config/configurator.py
+	echo "" >> config/configurator.py
 	echo "		parser = configparser.ConfigParser()" >> config/configurator.py
-	echo "		parser.read(\"config/configuration.ini\")" >> config/configurator.py
+	echo "		parser.read(config_path)" >> config/configurator.py
 	echo "		return parser" >> config/configurator.py
 	echo "" >> config/configurator.py
 	echo "	@staticmethod" >> config/configurator.py
