@@ -76,9 +76,17 @@ fast(){
 	echo "" >> configuration.ini
 	echo "[DEV]" >> configuration.ini
 	echo "host = localhost" >> configuration.ini
+	echo "db_host = localhost" >> configuration.ini
+	echo "db_user = root" >> configuration.ini
+	echo "db_password = root" >> configuration.ini
+	echo "db_name = climbSettings" >> configuration.ini
 	echo "" >> configuration.ini
 	echo "[PROD]" >> configuration.ini
 	echo "host = prodhost" >> configuration.ini
+	echo "db_host = mysql" >> configuration.ini
+	echo "db_user = root" >> configuration.ini
+	echo "db_password = root" >> configuration.ini
+	echo "db_name = climbSettings" >> configuration.ini
 	echo "" >> configuration.ini
 	echo "[COMMON]" >> configuration.ini
 	echo "model = mymodel" >> configuration.ini
@@ -271,6 +279,7 @@ db(){
 	echo 'from sqlalchemy.ext.declarative import declarative_base' >> db.py
 	echo 'from sqlalchemy.orm import sessionmaker' >> db.py
 	echo 'from config.configurator import Configurator' >> db.py
+	echo 'from contextlib import contextmanager' >> db.py
 	echo '' >> db.py
 	echo '# 데이터베이스 연결 설정' >> db.py
 	echo 'DB_HOST = Configurator.get_env_value("db_host")' >> db.py
@@ -289,6 +298,7 @@ db(){
 	echo 'Base = declarative_base()' >> db.py
 	echo '' >> db.py
 	echo '# 데이터베이스 세션 가져오기' >> db.py
+	echo '@contextmanager' >> db.py
 	echo 'def get_db():' >> db.py
 	echo '    db = SessionLocal()' >> db.py
 	echo '    try:' >> db.py
