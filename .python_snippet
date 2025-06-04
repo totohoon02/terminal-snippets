@@ -260,6 +260,34 @@ mvc(){
 
 }
 
+# 반대 함수: rmvc
+rmvc() {
+    mdName="$1"
+    if [ -z "$mdName" ]; then
+        echo "❌ 모듈이름이 비어 있습니다."
+        return 1
+    fi
+
+    # 이름 변환
+    upperName="$(echo "${mdName:0:1}" | tr '[:lower:]' '[:upper:]')${mdName:1}"
+    lowerName="$(echo "${mdName:0:1}" | tr '[:upper:]' '[:lower:]')${mdName:1}"
+
+    # 생성된 파일 삭제
+    rm -f "controller/${lowerName}Controller.py"
+    rm -f "service/inf/${lowerName}Service.py"
+    rm -f "service/${lowerName}ServiceImpl.py"
+    rm -f "_module/modules/${lowerName}Module.py"
+
+    # main.py 안의 등록 코드 제거(파일은 유지)
+    if [ -f main.py ]; then
+        sed -i "/from controller import ${lowerName}Controller/d" main.py
+        sed -i "/app.include_router(${lowerName}Controller.router)/d" main.py
+    fi
+
+    echo "🗑️  '${mdName}' 모듈 관련 파일 삭제가 완료되었습니다."
+}
+
+
 run() {
     port=${1:-8000}
     uvicorn main:app --reload --port=$port
