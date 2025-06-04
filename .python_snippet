@@ -255,8 +255,17 @@ mvc(){
 	echo "		return ${upperName}ServiceImpl()" >> _module/modules/${lowerName}Module.py
 
 	# main
-	echo "from controller import ${lowerName}Controller" >> main.py
-	echo "app.include_router(${lowerName}Controller.router)" >> main.py
+	if ! grep -q "from controller import ${lowerName}Controller" main.py; then
+		sed -i "/^from fastapi import FastAPI$/a\\
+from controller import ${lowerName}Controller" main.py
+	fi
+
+	# 라우터 등록 줄은 맨 끝에 삽입 (중복 방지)
+	if ! grep -q "app.include_router(${lowerName}Controller.router)" main.py; then
+		# 마지막 줄이 개행으로 끝나지 않으면 개행 추가
+		tail -c1 main.py | read -r _ || echo >> main.py
+		echo "app.include_router(${lowerName}Controller.router)" >> main.py
+	fi
 
 }
 
