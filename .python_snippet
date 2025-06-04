@@ -40,35 +40,35 @@ fast(){
 	mkdir service
 	mkdir service/inf
 	mkdir tests
-	mkdir config
+	mkdir _config
 	mkdir model
-	mkdir module
-	mkdir module/modules
+	mkdir _module
+	mkdir _module/modules
 
 	# .env
 	echo '# Store Secret Value here. Not configuration.ini' > .env
 
 	# DI Config
-	echo "import inspect" > module/depends.py
-	echo "import pkgutil" >> module/depends.py
-	echo "import importlib" >> module/depends.py
-	echo "from module import modules" >> module/depends.py
-	echo "from injector import Injector, Module" >> module/depends.py
-	echo "" >> module/depends.py
-	echo "serviceModuels = []" >> module/depends.py
-	echo "" >> module/depends.py
-	echo "for _, name, is_pkg in pkgutil.iter_modules(modules.__path__):" >> module/depends.py
-	echo "    if is_pkg:" >> module/depends.py
-	echo "        continue" >> module/depends.py
+	echo "import inspect" > _module/depends.py
+	echo "import pkgutil" >> _module/depends.py
+	echo "import importlib" >> _module/depends.py
+	echo "from _module import modules" >> _module/depends.py
+	echo "from injector import Injector, Module" >> _module/depends.py
+	echo "" >> _module/depends.py
+	echo "serviceModuels = []" >> _module/depends.py
+	echo "" >> _module/depends.py
+	echo "for _, name, is_pkg in pkgutil.iter_modules(modules.__path__):" >> _module/depends.py
+	echo "    if is_pkg:" >> _module/depends.py
+	echo "        continue" >> _module/depends.py
 	echo ""
-	echo "    full_module_name = f'{modules.__name__}.{name}'" >> module/depends.py
-	echo "    module = importlib.import_module(full_module_name)" >> module/depends.py
+	echo "    full_module_name = f'{modules.__name__}.{name}'" >> _module/depends.py
+	echo "    _module = importlib.import_module(full_module_name)" >> _module/depends.py
 	echo ""
-	echo "    for attr_name, cls in inspect.getmembers(module, inspect.isclass):" >> module/depends.py
-	echo "        if issubclass(cls, Module) and cls is not Module and not inspect.isabstract(cls):" >> module/depends.py
-	echo "            serviceModuels.append(cls())" >> module/depends.py
-	echo "" >> module/depends.py
-	echo "injector = Injector(serviceModuels)" >> module/depends.py
+	echo "    for attr_name, cls in inspect.getmembers(_module, inspect.isclass):" >> _module/depends.py
+	echo "        if issubclass(cls, Module) and cls is not Module and not inspect.isabstract(cls):" >> _module/depends.py
+	echo "            serviceModuels.append(cls())" >> _module/depends.py
+	echo "" >> _module/depends.py
+	echo "injector = Injector(serviceModuels)" >> _module/depends.py
 
 	# configParser
 	echo "[ENV]" > configuration.ini
@@ -92,77 +92,77 @@ fast(){
 	echo "model = mymodel" >> configuration.ini
 
 	# configurator
-	echo "import os" > config/configurator.py
-	echo "import configparser" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "class Configurator:" >> config/configurator.py
-	echo "	\"\"\"" >> config/configurator.py
-	echo "	Configuration Manager" >> config/configurator.py
-	echo "	Get Configuration Value from 'configuration.ini'" >> config/configurator.py
-	echo "	\"Never change this file\"" >> config/configurator.py
-	echo "	\"\"\"" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "	@staticmethod" >> config/configurator.py
-	echo "	def __get_parser():" >> config/configurator.py
-	echo "		base_dir = os.path.dirname(os.path.abspath(__file__))" >> config/configurator.py
-	echo "		config_path = os.path.join(base_dir, '..', 'configuration.ini')" >> config/configurator.py
-	echo "		config_path = os.path.abspath(config_path)" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		parser = configparser.ConfigParser()" >> config/configurator.py
-	echo "		parser.read(config_path)" >> config/configurator.py
-	echo "		return parser" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "	@staticmethod" >> config/configurator.py
-	echo "	def get_current_env():" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		Get current environment name" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Returns:" >> config/configurator.py
-	echo "			str: environment name" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		return Configurator.__get_parser()[\"ENV\"][\"env\"]" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "	@staticmethod" >> config/configurator.py
-	echo "	def get_env_value(key: str):" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		Get Current Environment's(DEV, PROD) Value" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Args:" >> config/configurator.py
-	echo "		    key (str): key" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Returns:" >> config/configurator.py
-	echo "		    str: value" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		env = Configurator.get_current_env()" >> config/configurator.py
-	echo "		return Configurator.__get_parser()[env][key]" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "	@staticmethod" >> config/configurator.py
-	echo "	def get_common_value(key: str):" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		Get 'Common' Configuration Value" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Args:" >> config/configurator.py
-	echo "		    key (str): key" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Returns:" >> config/configurator.py
-	echo "		    str: value" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		return Configurator.__get_parser()[\"COMMON\"][key]" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "	@staticmethod" >> config/configurator.py
-	echo "	def get_section_value(section: str, key: str):" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		Get Section Configuration Value" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Args:" >> config/configurator.py
-	echo "		    section (str): section(COMMON, DEV, PROD)" >> config/configurator.py
-	echo "		    key (str): key" >> config/configurator.py
-	echo "" >> config/configurator.py
-	echo "		Returns:" >> config/configurator.py
-	echo "		    str: value" >> config/configurator.py
-	echo "		\"\"\"" >> config/configurator.py
-	echo "		return Configurator.__get_parser()[section][key]" >> config/configurator.py
-	echo "" >> config/configurator.py
+	echo "import os" > _config/configurator.py
+	echo "import configparser" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "class Configurator:" >> _config/configurator.py
+	echo "	\"\"\"" >> _config/configurator.py
+	echo "	Configuration Manager" >> _config/configurator.py
+	echo "	Get Configuration Value from 'configuration.ini'" >> _config/configurator.py
+	echo "	\"Never change this file\"" >> _config/configurator.py
+	echo "	\"\"\"" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "	@staticmethod" >> _config/configurator.py
+	echo "	def __get_parser():" >> _config/configurator.py
+	echo "		base_dir = os.path.dirname(os.path.abspath(__file__))" >> _config/configurator.py
+	echo "		config_path = os.path.join(base_dir, '..', 'configuration.ini')" >> _config/configurator.py
+	echo "		config_path = os.path.abspath(config_path)" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		parser = configparser.ConfigParser()" >> _config/configurator.py
+	echo "		parser.read(config_path)" >> _config/configurator.py
+	echo "		return parser" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "	@staticmethod" >> _config/configurator.py
+	echo "	def get_current_env():" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		Get current environment name" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Returns:" >> _config/configurator.py
+	echo "			str: environment name" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		return Configurator.__get_parser()[\"ENV\"][\"env\"]" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "	@staticmethod" >> _config/configurator.py
+	echo "	def get_env_value(key: str):" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		Get Current Environment's(DEV, PROD) Value" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Args:" >> _config/configurator.py
+	echo "		    key (str): key" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Returns:" >> _config/configurator.py
+	echo "		    str: value" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		env = Configurator.get_current_env()" >> _config/configurator.py
+	echo "		return Configurator.__get_parser()[env][key]" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "	@staticmethod" >> _config/configurator.py
+	echo "	def get_common_value(key: str):" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		Get 'Common' Configuration Value" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Args:" >> _config/configurator.py
+	echo "		    key (str): key" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Returns:" >> _config/configurator.py
+	echo "		    str: value" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		return Configurator.__get_parser()[\"COMMON\"][key]" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "	@staticmethod" >> _config/configurator.py
+	echo "	def get_section_value(section: str, key: str):" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		Get Section Configuration Value" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Args:" >> _config/configurator.py
+	echo "		    section (str): section(COMMON, DEV, PROD)" >> _config/configurator.py
+	echo "		    key (str): key" >> _config/configurator.py
+	echo "" >> _config/configurator.py
+	echo "		Returns:" >> _config/configurator.py
+	echo "		    str: value" >> _config/configurator.py
+	echo "		\"\"\"" >> _config/configurator.py
+	echo "		return Configurator.__get_parser()[section][key]" >> _config/configurator.py
+	echo "" >> _config/configurator.py
 
 	# main.py
 	echo "from fastapi import FastAPI" > main.py
@@ -186,10 +186,10 @@ fast(){
 	echo "" > controller/__init__.py
 	echo "" > service/__init__.py
 	echo "" > service/inf/__init__.py
-	echo "" > config/__init__.py
+	echo "" > _config/__init__.py
 	echo "" > model/__init__.py
-	echo "" > module/__init__.py
-	echo "" > module/modules/__init__.py
+	echo "" > _module/__init__.py
+	echo "" > _module/modules/__init__.py
 
 	rr
 }
@@ -207,7 +207,7 @@ mvc(){
 
 	# controller
 	echo "from fastapi import APIRouter" > controller/${lowerName}Controller.py
-	echo "from module.depends import injector" >> controller/${lowerName}Controller.py
+	echo "from _module.depends import injector" >> controller/${lowerName}Controller.py
 	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
 	echo "router = APIRouter(prefix='/hello', tags=['${lowerName}'])" >> controller/${lowerName}Controller.py
@@ -231,7 +231,7 @@ mvc(){
 
 	# service - Impl
 	echo "from .inf.${lowerName}Service import ${upperName}Service" >> service/${lowerName}ServiceImpl.py
-	echo "from config.configurator import Configurator" >> service/${lowerName}ServiceImpl.py
+	echo "from _config.configurator import Configurator" >> service/${lowerName}ServiceImpl.py
 	echo "" >> service/${lowerName}ServiceImpl.py
 	echo "" >> service/${lowerName}ServiceImpl.py
 	echo "class ${upperName}ServiceImpl(${upperName}Service):" >> service/${lowerName}ServiceImpl.py
@@ -242,17 +242,17 @@ mvc(){
 	echo "		return {'host': Configurator.get_env_value('host')}" >> service/${lowerName}ServiceImpl.py
 
 	# injector
-	echo "from injector import Module, singleton, provider" > module/modules/${lowerName}Module.py
-	echo "" >> module/modules/${lowerName}Module.py
-	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> module/modules/${lowerName}Module.py
-	echo "from service.${lowerName}ServiceImpl import ${upperName}ServiceImpl" >> module/modules/${lowerName}Module.py
-	echo "" >> module/modules/${lowerName}Module.py
-	echo "" >> module/modules/${lowerName}Module.py
-	echo "class ${upperName}Module(Module):" >> module/modules/${lowerName}Module.py
-	echo "	@singleton" >> module/modules/${lowerName}Module.py
-	echo "	@provider" >> module/modules/${lowerName}Module.py
-	echo "	def ${lowerName}Service(self) -> ${upperName}Service:" >> module/modules/${lowerName}Module.py
-	echo "		return ${upperName}ServiceImpl()" >> module/modules/${lowerName}Module.py
+	echo "from injector import Module, singleton, provider" > _module/modules/${lowerName}Module.py
+	echo "" >> _module/modules/${lowerName}Module.py
+	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> _module/modules/${lowerName}Module.py
+	echo "from service.${lowerName}ServiceImpl import ${upperName}ServiceImpl" >> _module/modules/${lowerName}Module.py
+	echo "" >> _module/modules/${lowerName}Module.py
+	echo "" >> _module/modules/${lowerName}Module.py
+	echo "class ${upperName}Module(Module):" >> _module/modules/${lowerName}Module.py
+	echo "	@singleton" >> _module/modules/${lowerName}Module.py
+	echo "	@provider" >> _module/modules/${lowerName}Module.py
+	echo "	def ${lowerName}Service(self) -> ${upperName}Service:" >> _module/modules/${lowerName}Module.py
+	echo "		return ${upperName}ServiceImpl()" >> _module/modules/${lowerName}Module.py
 
 	# main
 	echo "from controller import ${lowerName}Controller" >> main.py
@@ -278,7 +278,7 @@ db(){
     echo 'from sqlalchemy import create_engine' > db.py
 	echo 'from sqlalchemy.ext.declarative import declarative_base' >> db.py
 	echo 'from sqlalchemy.orm import sessionmaker' >> db.py
-	echo 'from config.configurator import Configurator' >> db.py
+	echo 'from _config.configurator import Configurator' >> db.py
 	echo 'from contextlib import contextmanager' >> db.py
 	echo '' >> db.py
 	echo '# 데이터베이스 연결 설정' >> db.py
