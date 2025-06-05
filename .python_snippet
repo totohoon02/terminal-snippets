@@ -210,7 +210,7 @@ mvc(){
 	echo "from _module.depends import injector" >> controller/${lowerName}Controller.py
 	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
-	echo "router = APIRouter(prefix='/hello', tags=['${lowerName}'])" >> controller/${lowerName}Controller.py
+	echo "router = APIRouter(prefix='/${lowerName}', tags=['${lowerName}'])" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
 	echo "# service" >> controller/${lowerName}Controller.py
 	echo "${lowerName}Service = injector.get(${upperName}Service)" >> controller/${lowerName}Controller.py
@@ -309,7 +309,7 @@ rr(){
 
 db(){
     # install package
-    pip install sqlalchemy pymysql
+    pip install sqlalchemy pymysql cryptography
 
     # create db.py
     echo 'from sqlalchemy import create_engine' > db.py
