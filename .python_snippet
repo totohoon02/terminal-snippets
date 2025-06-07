@@ -164,10 +164,29 @@ fast(){
 	echo "		return Configurator.__get_parser()[section][key]" >> _config/configurator.py
 	echo "" >> _config/configurator.py
 
+	# routeConfiurator
+	echo "from pathlib import Path" > _config/routeConfiurator.py
+	echo "import importlib" >> _config/routeConfiurator.py
+	echo "" >> _config/routeConfiurator.py
+	echo "def include_routers(app):" >> _config/routeConfiurator.py
+	echo "    controller_dir = Path(__file__).parent.parent / 'controller'" >> _config/routeConfiurator.py
+	echo "" >> _config/routeConfiurator.py
+	echo "    for file_path in controller_dir.glob('*Controller.py'):" >> _config/routeConfiurator.py
+	echo "        module_name = file_path.stem" >> _config/routeConfiurator.py
+	echo "        module_path = f'controller.{module_name}'" >> _config/routeConfiurator.py
+	echo "" >> _config/routeConfiurator.py
+	echo "        module = importlib.import_module(module_path)" >> _config/routeConfiurator.py
+	echo "" >> _config/routeConfiurator.py
+	echo "        if hasattr(module, 'router'):" >> _config/routeConfiurator.py
+	echo "            app.include_router(module.router)" >> _config/routeConfiurator.py
+
 	# main.py
 	echo "from fastapi import FastAPI" > main.py
+	echo "from _config.routeConfiurator import include_routers" >> main.py
 	echo "" >> main.py
 	echo "app = FastAPI()" >> main.py
+	echo "" >> main.py
+	echo "include_routers(app)" >> main.py
 	echo "" >> main.py
 
 	# sample test
@@ -253,20 +272,6 @@ mvc(){
 	echo "	@provider" >> _module/modules/${lowerName}Module.py
 	echo "	def ${lowerName}Service(self) -> ${upperName}Service:" >> _module/modules/${lowerName}Module.py
 	echo "		return ${upperName}ServiceImpl()" >> _module/modules/${lowerName}Module.py
-
-	# main
-	if ! grep -q "from controller import ${lowerName}Controller" main.py; then
-		sed -i "/^from fastapi import FastAPI$/a\\
-from controller import ${lowerName}Controller" main.py
-	fi
-
-	# 라우터 등록 줄은 맨 끝에 삽입 (중복 방지)
-	if ! grep -q "app.include_router(${lowerName}Controller.router)" main.py; then
-		# 마지막 줄이 개행으로 끝나지 않으면 개행 추가
-		tail -c1 main.py | read -r _ || echo >> main.py
-		echo "app.include_router(${lowerName}Controller.router)" >> main.py
-	fi
-
 }
 
 # 반대 함수: rmvc
@@ -286,12 +291,6 @@ rmvc() {
     rm -f "service/inf/${lowerName}Service.py"
     rm -f "service/${lowerName}ServiceImpl.py"
     rm -f "_module/modules/${lowerName}Module.py"
-
-    # main.py 안의 등록 코드 제거(파일은 유지)
-    if [ -f main.py ]; then
-        sed -i "/from controller import ${lowerName}Controller/d" main.py
-        sed -i "/app.include_router(${lowerName}Controller.router)/d" main.py
-    fi
 
     echo "🗑️  '${mdName}' 모듈 관련 파일 삭제가 완료되었습니다."
 }
@@ -343,8 +342,15 @@ db(){
 	echo '    finally:' >> db.py
 	echo '        db.close()' >> db.py
 
+	# table.py
+	echo "from db import Base" > model/table.py
+	echo "" >> model/table.py
+	echo "class SampleTable(Base):" >> model/table.py
+	echo "    __tablename__ = 'sample'" >> model/table.py
+
     # main.py
-    sed -i '/from controller import authController/a from db import engine, Base' main.py
+    sed -i '/from _config.routeConfiurator import include_routers/a from db import engine, Base' main.py
+    sed -i '/from db import engine, Base/a from model.table import *' main.py
     echo "Base.metadata.create_all(bind=engine)" >> main.py
 }
 
