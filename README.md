@@ -33,7 +33,10 @@ source ./terminal-snippets/.bash_include
 - **jdocker** (basic java Docker file)
 - **build** 'image:dev'
 - **rmi** (remove danglings)
-
+- **mvc** 'name'
+- **rmvc** 'name'
+- **inf** 'servive:name'
+  
 ### bash
 
 - **pk** 'port' (kill port)
