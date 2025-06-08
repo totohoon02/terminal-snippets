@@ -372,7 +372,6 @@ inf() {
     return 1
   fi
 
-  # 클래스명 추출
   local class_name
   class_name="$(grep -E '^class[ ]+[A-Za-z_][A-Za-z0-9_]*' "$impl_path" \
     | sed -E 's/^class[ ]+([A-Za-z_][A-Za-z0-9_]*).*/\1/' \
@@ -383,32 +382,42 @@ inf() {
     return 1
   fi
 
-  # 인터페이스 클래스명 정제
   local interface_class="${class_name%Impl}"
   interface_class="$(tr '[:lower:]' '[:upper:]' <<< "${interface_class:0:1}")${interface_class:1}"
 
-  # 추출: 전체 시그니처 (def ~)
   local method_lines
   method_lines="$(grep -E '^[[:space:]]+def [a-zA-Z_][a-zA-Z0-9_]*\(.*\):' "$impl_path" \
     | grep -v '__init__')"
 
-  {
-    echo "from abc import ABC, abstractmethod"
-    echo
-    echo "class $interface_class(ABC):"
-    echo
-    while IFS= read -r line; do
-      # 들여쓰기 제거
-      sig="$(echo "$line" | sed -E 's/^[[:space:]]+//')"
-      echo "    @abstractmethod"
-      echo "    $sig"
-      echo "        pass"
-      echo
-    done <<< "$method_lines"
-  } > "$inf_path"
+	{
+		echo "from abc import ABC, abstractmethod"
+		echo
+		echo "class $interface_class(ABC):"
+		echo
 
-  echo "✅ 인터페이스 파일 생성 완료: $inf_path"
+	while IFS= read -r line; do
+		sig="$(echo "$line" | sed -E 's/^[[:space:]]+//')"
+		sig="$(echo "$sig" | sed -E 's/^def ([a-zA-Z_][a-zA-Z0-9_]*)\((.*)\):.*/def \1(\2):/')"
+		params="$(echo "$sig" | sed -E 's/^def [a-zA-Z_][a-zA-Z0-9_]*\((.*)\):/\1/')"
+		params="$(echo "$params" | sed -E 's/:[^,)=]+//g' | sed -E 's/=[^,)=]+//g' | sed -E 's/ +/ /g' | sed -E 's/^ | $//g')"
+		# 끝에 괄호가 남으면 제거
+		params="$(echo "$params" | sed -E 's/\)$//')"
+		func_name="$(echo "$sig" | sed -E 's/^def ([a-zA-Z_][a-zA-Z0-9_]*)\(.*$/\1/')"
+		sig="def $func_name($params):"
+		# 혹시라도 괄호 연속 정리
+		sig="$(echo "$sig" | sed -E 's/\)+/)/g')"
+
+		echo "    @abstractmethod"
+		echo "    $sig"
+		echo "        pass"
+		echo
+	done <<< "$method_lines"
+	} > "$inf_path"
+
+    echo "✅ 인터페이스 파일 생성 완료: $inf_path"
 }
+
+
 
 alias pi="pip install"
 alias pui="pip uninstall"
