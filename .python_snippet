@@ -210,6 +210,8 @@ fast(){
 	echo "" > _module/__init__.py
 	echo "" > _module/modules/__init__.py
 
+	# readme
+	echo "# Fast" > README.md
 	rr
 }
 
@@ -352,6 +354,60 @@ db(){
     sed -i '/from _config.routeConfiurator import include_routers/a from db import engine, Base' main.py
     sed -i '/from db import engine, Base/a from model.table import *' main.py
     echo "Base.metadata.create_all(bind=engine)" >> main.py
+}
+
+inf() {
+  if [ -z "$1" ]; then
+    echo "❌ 오류: 서비스 이름을 인자로 전달해야 합니다." >&2
+    echo "사용법: inf <ServiceName>" >&2
+    return 1
+  fi
+
+  local name="$1"
+  local impl_path="./service/${name}ServiceImpl.py"
+  local inf_path="./service/inf/${name}Service.py"
+
+  if [ ! -f "$impl_path" ]; then
+    echo "❌ 오류: 구현 파일이 존재하지 않습니다: $impl_path" >&2
+    return 1
+  fi
+
+  # 클래스명 추출
+  local class_name
+  class_name="$(grep -E '^class[ ]+[A-Za-z_][A-Za-z0-9_]*' "$impl_path" \
+    | sed -E 's/^class[ ]+([A-Za-z_][A-Za-z0-9_]*).*/\1/' \
+    | head -n1)"
+
+  if [ -z "$class_name" ]; then
+    echo "❌ 오류: 클래스 정의를 찾을 수 없습니다: $impl_path" >&2
+    return 1
+  fi
+
+  # 인터페이스 클래스명 정제
+  local interface_class="${class_name%Impl}"
+  interface_class="$(tr '[:lower:]' '[:upper:]' <<< "${interface_class:0:1}")${interface_class:1}"
+
+  # 추출: 전체 시그니처 (def ~)
+  local method_lines
+  method_lines="$(grep -E '^[[:space:]]+def [a-zA-Z_][a-zA-Z0-9_]*\(.*\):' "$impl_path" \
+    | grep -v '__init__')"
+
+  {
+    echo "from abc import ABC, abstractmethod"
+    echo
+    echo "class $interface_class(ABC):"
+    echo
+    while IFS= read -r line; do
+      # 들여쓰기 제거
+      sig="$(echo "$line" | sed -E 's/^[[:space:]]+//')"
+      echo "    @abstractmethod"
+      echo "    $sig"
+      echo "        pass"
+      echo
+    done <<< "$method_lines"
+  } > "$inf_path"
+
+  echo "✅ 인터페이스 파일 생성 완료: $inf_path"
 }
 
 alias pi="pip install"
