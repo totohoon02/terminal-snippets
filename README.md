@@ -23,6 +23,9 @@ source ./terminal-snippets/.bash_include
 - **db** (sqlalchemy setup)
 - **pi** pip install
 - **pui** pip uninstall
+- **mvc** 'name'
+- **rmvc** 'name'
+- **inf** 'servive:name'
 
 ### docker
 
@@ -33,9 +36,6 @@ source ./terminal-snippets/.bash_include
 - **jdocker** (basic java Docker file)
 - **build** 'image:dev'
 - **rmi** (remove danglings)
-- **mvc** 'name'
-- **rmvc** 'name'
-- **inf** 'servive:name'
   
 ### bash
 
