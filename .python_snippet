@@ -299,7 +299,7 @@ rmvc() {
 
 
 run() {
-    port=${1:-8000}
+    port=${1:-8080}
     uvicorn main:app --reload --port=$port
 }
 
