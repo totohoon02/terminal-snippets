@@ -79,6 +79,7 @@ fast(){
 	echo "db_host = localhost" >> configuration.ini
 	echo "db_user = root" >> configuration.ini
 	echo "db_password = root" >> configuration.ini
+	echo "db_port = 3307" >> configuration.ini
 	echo "db_name = climbSettings" >> configuration.ini
 	echo "" >> configuration.ini
 	echo "[PROD]" >> configuration.ini
@@ -86,6 +87,7 @@ fast(){
 	echo "db_host = mysql" >> configuration.ini
 	echo "db_user = root" >> configuration.ini
 	echo "db_password = root" >> configuration.ini
+	echo "db_port = 3307" >> configuration.ini
 	echo "db_name = climbSettings" >> configuration.ini
 	echo "" >> configuration.ini
 	echo "[COMMON]" >> configuration.ini
@@ -324,9 +326,10 @@ db(){
 	echo 'DB_USER = Configurator.get_env_value("db_user")' >> db.py
 	echo 'DB_PASSWORD = Configurator.get_env_value("db_password")' >> db.py
 	echo 'DB_NAME = Configurator.get_env_value("db_name")' >> db.py
+	echo 'DB_PORT = Configurator.get_env_value("db_port")' >> db.py
 	echo '' >> db.py
 	echo '# SQLAlchemy 엔진 생성' >> db.py
-	echo 'DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"' >> db.py
+	echo 'DATABASE_URL = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"' >> db.py
 	echo 'engine = create_engine(DATABASE_URL)' >> db.py
 	echo '' >> db.py
 	echo '# 세션 생성' >> db.py
