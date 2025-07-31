@@ -8,6 +8,18 @@ ct(){
     echo '    return int(input().strip())' >> codingTest.py
     echo '' >> codingTest.py
     echo '' >> codingTest.py
+    echo 'def lstinput():' >> codingTest.py
+    echo '    return list(input().strip())' >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'def lstinput_map_int():' >> codingTest.py
+    echo '    return list(map(int, list(input().strip())))' >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
+    echo 'def lstinput():' >> codingTest.py
+    echo '    return list(input().strip())' >> codingTest.py
+    echo '' >> codingTest.py
+    echo '' >> codingTest.py
     echo 'def spt(sep=" "):' >> codingTest.py
     echo '    return input().strip().split(sep)' >> codingTest.py
     echo '' >> codingTest.py
@@ -16,11 +28,6 @@ ct(){
     echo '    return list(map(int, input().strip().split(sep)))' >> codingTest.py
     echo '' >> codingTest.py
     echo '' >> codingTest.py
-    echo 'def sol():' >> codingTest.py
-    echo '    'pass >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'sol()' >> codingTest.py
 }
 
 rct(){
