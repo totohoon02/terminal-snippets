@@ -1,35 +1,35 @@
 ct(){
-    echo 'import sys' > codingTest.py
-    echo '' >> codingTest.py
-    echo 'input = sys.stdin.readline' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'def iinput():' >> codingTest.py
-    echo '    return int(input().strip())' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'def lstinput():' >> codingTest.py
-    echo '    return list(input().strip())' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'def lstinput_map_int():' >> codingTest.py
-    echo '    return list(map(int, list(input().strip())))' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'def lstinput():' >> codingTest.py
-    echo '    return list(input().strip())' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'def spt(sep=" "):' >> codingTest.py
-    echo '    return input().strip().split(sep)' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
-    echo 'def spt_map_int(sep=" "):' >> codingTest.py
-    echo '    return list(map(int, input().strip().split(sep)))' >> codingTest.py
-    echo '' >> codingTest.py
-    echo '' >> codingTest.py
+    echo 'import sys' > ct.py
+    echo '' >> ct.py
+    echo 'input = sys.stdin.readline' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
+    echo 'def iinput():' >> ct.py
+    echo '    return int(input().strip())' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
+    echo 'def lstinput():' >> ct.py
+    echo '    return list(input().strip())' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
+    echo 'def lstinput_map_int():' >> ct.py
+    echo '    return list(map(int, list(input().strip())))' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
+    echo 'def lstinput():' >> ct.py
+    echo '    return list(input().strip())' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
+    echo 'def spt(sep=" "):' >> ct.py
+    echo '    return input().strip().split(sep)' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
+    echo 'def spt_map_int(sep=" "):' >> ct.py
+    echo '    return list(map(int, input().strip().split(sep)))' >> ct.py
+    echo '' >> ct.py
+    echo '' >> ct.py
 }
 
 rct(){
-    python codingTest.py
+    python ct.py
 }
