@@ -9,6 +9,14 @@ init() {
 	cd "$1"
 }
 
+activate(){
+    if [ -d "./.venv/Scripts/" ]; then
+        . .venv/Scripts/activate
+    else
+        . .venv/bin/activate
+    fi
+}
+
 requirements(){
 	uv sync
 }
