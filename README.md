@@ -13,16 +13,15 @@ source ./terminal-snippets/.bash_include
 
 ### python
 
-- **venv** 'py:version'
-- **activate**
+- **init**
 - **requirements** (install requirements)
 - **freeze**
 - **fast** (fastapi setup)
 - **mvc** (add controller, service, dpendency)
 - **run** 'port'
 - **db** (sqlalchemy setup)
-- **pi** pip install
-- **pui** pip uninstall
+- **ui** pip install
+- **uui** pip uninstall
 - **mvc** 'name'
 - **rmvc** 'name'
 - **inf** 'servive:name'
@@ -35,8 +34,9 @@ source ./terminal-snippets/.bash_include
 - **pydocker** (basic python Docker file)
 - **jdocker** (basic java Docker file)
 - **build** 'image:dev'
+- **dkrun** 'Ex_Port:Int_port ImageName'
 - **rmi** (remove danglings)
-  
+
 ### bash
 
 - **pk** 'port' (kill port)

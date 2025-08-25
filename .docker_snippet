@@ -1,21 +1,28 @@
 alias up="docker compose up -d"
 alias down="docker compose down"
 
-pydocker(){
+pydocker() {
     echo 'FROM python:3.10-slim' > Dockerfile
+    echo '' >> Dockerfile
+    echo '# 1. uv 설치' >> Dockerfile
+    echo 'RUN pip install uv' >> Dockerfile
     echo '' >> Dockerfile
     echo 'WORKDIR /app' >> Dockerfile
     echo '' >> Dockerfile
-    echo 'COPY requirements.txt .' >> Dockerfile
+    echo '# 2. pyproject.toml & uv.lock 복사' >> Dockerfile
+    echo 'COPY pyproject.toml uv.lock ./' >> Dockerfile
     echo '' >> Dockerfile
-    echo 'RUN pip install -r requirements.txt' >> Dockerfile
+    echo '# 3. 의존성 설치 (재현성 보장)' >> Dockerfile
+    echo 'RUN uv sync --frozen --no-dev' >> Dockerfile
     echo '' >> Dockerfile
+    echo '# 4. 애플리케이션 복사' >> Dockerfile
     echo 'COPY . .' >> Dockerfile
     echo '' >> Dockerfile
     echo 'EXPOSE 8000' >> Dockerfile
     echo '' >> Dockerfile
-    echo 'CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]' >> Dockerfile
+    echo 'CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]' >> Dockerfile
 }
+
 
 jdocker() {
     name=${1:-app}
@@ -37,6 +44,20 @@ recon(){
     down
     up --build
 }
+
+dkrun() {
+    port=$1
+    iName=$2
+
+    if [ -z "$port" ] || [ -z "$iName" ]; then
+        echo "❌ 오류: 포트 번호와 이미지 이름을 입력하세요."
+        echo "사용법: drun <Ex_port:Int_port> <image_name>"
+        return 
+    fi
+
+    docker run -d -p "$port" "$iName"
+}
+
 
 build(){
     docker build -t "$@" .
