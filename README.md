@@ -45,6 +45,7 @@ source ./terminal-snippets/.bash_include
 - **rcopy** 'input' (reverse input and copy it -> tupni)
 - **after** 'date base_date(optional)'
 - **lck** '-d(optional) filename'
+- **yml** 'filename'
 - **sb** source ~/.bash_profile
 - **sz** soucre ~/.zshrc
 
