@@ -1,0 +1,23 @@
+to_yml() {
+    local input_file="application.properties"
+    local dir="./src/main/resources"
+
+    if [ ! -f "$dir/$input_file" ]; then
+        echo "❌ 파일을 찾을 수 없습니다: $input_file"
+        return 1
+    fi
+
+    mv "$dir/$input_file" "$dir/application.yml"
+}
+
+to_prop(){
+    local input_file="application.yml"
+    local dir="./src/main/resources"
+
+    if [ ! -f "$dir/$input_file" ]; then
+        echo "❌ 파일을 찾을 수 없습니다: $input_file"
+        return 1
+    fi
+
+    mv "$dir/$input_file" "$dir/application.properties"
+}
