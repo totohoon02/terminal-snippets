@@ -41,35 +41,34 @@ fast(){
 	mkdir service
 	mkdir service/inf
 	mkdir tests
-	mkdir _config
 	mkdir model
-	mkdir _module
-	mkdir _module/modules
+	mkdir _config
+	mkdir module
 
 	# .env
 	echo '# Store Secret Value here. Not configuration.ini' > .env
 
 	# DI Config
-	echo "import inspect" > _module/depends.py
-	echo "import pkgutil" >> _module/depends.py
-	echo "import importlib" >> _module/depends.py
-	echo "from _module import modules" >> _module/depends.py
-	echo "from injector import Injector, Module" >> _module/depends.py
-	echo "" >> _module/depends.py
-	echo "serviceModuels = []" >> _module/depends.py
-	echo "" >> _module/depends.py
-	echo "for _, name, is_pkg in pkgutil.iter_modules(modules.__path__):" >> _module/depends.py
-	echo "    if is_pkg:" >> _module/depends.py
-	echo "        continue" >> _module/depends.py
+	echo "import inspect" > _config/depends.py
+	echo "import pkgutil" >> _config/depends.py
+	echo "import importlib" >> _config/depends.py
+	echo "import module" >> _config/depends.py
+	echo "from injector import Injector, Module" >> _config/depends.py
+	echo "" >> _config/depends.py
+	echo "serviceModuels = []" >> _config/depends.py
+	echo "" >> _config/depends.py
+	echo "for _, name, is_pkg in pkgutil.iter_modules(module.__path__):" >> _config/depends.py
+	echo "    if is_pkg:" >> _config/depends.py
+	echo "        continue" >> _config/depends.py
 	echo ""
-	echo "    full_module_name = f'{modules.__name__}.{name}'" >> _module/depends.py
-	echo "    _module = importlib.import_module(full_module_name)" >> _module/depends.py
+	echo "    full_module_name = f'{module.__name__}.{name}'" >> _config/depends.py
+	echo "    m = importlib.import_module(full_module_name)" >> _config/depends.py
 	echo ""
-	echo "    for attr_name, cls in inspect.getmembers(_module, inspect.isclass):" >> _module/depends.py
-	echo "        if issubclass(cls, Module) and cls is not Module and not inspect.isabstract(cls):" >> _module/depends.py
-	echo "            serviceModuels.append(cls())" >> _module/depends.py
-	echo "" >> _module/depends.py
-	echo "injector = Injector(serviceModuels)" >> _module/depends.py
+	echo "    for attr_name, cls in inspect.getmembers(m, inspect.isclass):" >> _config/depends.py
+	echo "        if issubclass(cls, Module) and cls is not Module and not inspect.isabstract(cls):" >> _config/depends.py
+	echo "            serviceModuels.append(cls())" >> _config/depends.py
+	echo "" >> _config/depends.py
+	echo "injector = Injector(serviceModuels)" >> _config/depends.py
 
 	# configParser
 	echo "[ENV]" > configuration.ini
@@ -167,25 +166,26 @@ fast(){
 	echo "		return Configurator.__get_parser()[section][key]" >> _config/configurator.py
 	echo "" >> _config/configurator.py
 
-	# routeConfiurator
-	echo "from pathlib import Path" > _config/routeConfiurator.py
-	echo "import importlib" >> _config/routeConfiurator.py
-	echo "" >> _config/routeConfiurator.py
-	echo "def include_routers(app):" >> _config/routeConfiurator.py
-	echo "    controller_dir = Path(__file__).parent.parent / 'controller'" >> _config/routeConfiurator.py
-	echo "" >> _config/routeConfiurator.py
-	echo "    for file_path in controller_dir.glob('*Controller.py'):" >> _config/routeConfiurator.py
-	echo "        module_name = file_path.stem" >> _config/routeConfiurator.py
-	echo "        module_path = f'controller.{module_name}'" >> _config/routeConfiurator.py
-	echo "" >> _config/routeConfiurator.py
-	echo "        module = importlib.import_module(module_path)" >> _config/routeConfiurator.py
-	echo "" >> _config/routeConfiurator.py
-	echo "        if hasattr(module, 'router'):" >> _config/routeConfiurator.py
-	echo "            app.include_router(module.router)" >> _config/routeConfiurator.py
+	# routeConfigurator
+	echo "import importlib" > _config/routeConfigurator.py
+	echo "from pathlib import Path" >> _config/routeConfigurator.py
+	echo "from fastapi import FastAPI" >> _config/routeConfigurator.py
+	echo "" >> _config/routeConfigurator.py
+	echo "def include_routers(app: FastAPI):" >> _config/routeConfigurator.py
+	echo "    controller_dir = Path(__file__).parent.parent / 'controller'" >> _config/routeConfigurator.py
+	echo "" >> _config/routeConfigurator.py
+	echo "    for file_path in controller_dir.glob('*Controller.py'):" >> _config/routeConfigurator.py
+	echo "        module_name = file_path.stem" >> _config/routeConfigurator.py
+	echo "        module_path = f'controller.{module_name}'" >> _config/routeConfigurator.py
+	echo "" >> _config/routeConfigurator.py
+	echo "        module = importlib.import_module(module_path)" >> _config/routeConfigurator.py
+	echo "" >> _config/routeConfigurator.py
+	echo "        if hasattr(module, 'router'):" >> _config/routeConfigurator.py
+	echo "            app.include_router(module.router)" >> _config/routeConfigurator.py
 
 	# main.py
 	echo "from fastapi import FastAPI" > main.py
-	echo "from _config.routeConfiurator import include_routers" >> main.py
+	echo "from _config.routeConfigurator import include_routers" >> main.py
 	echo "" >> main.py
 	echo "app = FastAPI()" >> main.py
 	echo "" >> main.py
@@ -210,8 +210,7 @@ fast(){
 	echo "" > service/inf/__init__.py
 	echo "" > _config/__init__.py
 	echo "" > model/__init__.py
-	echo "" > _module/__init__.py
-	echo "" > _module/modules/__init__.py
+	echo "" > module/__init__.py
 
 	# readme
 	echo "# Fast" > README.md
@@ -231,7 +230,7 @@ mvc(){
 
 	# controller
 	echo "from fastapi import APIRouter" > controller/${lowerName}Controller.py
-	echo "from _module.depends import injector" >> controller/${lowerName}Controller.py
+	echo "from _config.depends import injector" >> controller/${lowerName}Controller.py
 	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> controller/${lowerName}Controller.py
 	echo "" >> controller/${lowerName}Controller.py
 	echo "router = APIRouter(prefix='/${lowerName}', tags=['${lowerName}'])" >> controller/${lowerName}Controller.py
@@ -266,17 +265,17 @@ mvc(){
 	echo "		return {'host': Configurator.get_env_value('host')}" >> service/${lowerName}ServiceImpl.py
 
 	# injector
-	echo "from injector import Module, singleton, provider" > _module/modules/${lowerName}Module.py
-	echo "" >> _module/modules/${lowerName}Module.py
-	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> _module/modules/${lowerName}Module.py
-	echo "from service.${lowerName}ServiceImpl import ${upperName}ServiceImpl" >> _module/modules/${lowerName}Module.py
-	echo "" >> _module/modules/${lowerName}Module.py
-	echo "" >> _module/modules/${lowerName}Module.py
-	echo "class ${upperName}Module(Module):" >> _module/modules/${lowerName}Module.py
-	echo "	@singleton" >> _module/modules/${lowerName}Module.py
-	echo "	@provider" >> _module/modules/${lowerName}Module.py
-	echo "	def ${lowerName}Service(self) -> ${upperName}Service:" >> _module/modules/${lowerName}Module.py
-	echo "		return ${upperName}ServiceImpl()" >> _module/modules/${lowerName}Module.py
+	echo "from injector import Module, singleton, provider" > module/${lowerName}Module.py
+	echo "" >> module/${lowerName}Module.py
+	echo "from service.inf.${lowerName}Service import ${upperName}Service" >> module/${lowerName}Module.py
+	echo "from service.${lowerName}ServiceImpl import ${upperName}ServiceImpl" >> module/${lowerName}Module.py
+	echo "" >> module/${lowerName}Module.py
+	echo "" >> module/${lowerName}Module.py
+	echo "class ${upperName}Module(Module):" >> module/${lowerName}Module.py
+	echo "	@singleton" >> module/${lowerName}Module.py
+	echo "	@provider" >> module/${lowerName}Module.py
+	echo "	def ${lowerName}Service(self) -> ${upperName}Service:" >> module/${lowerName}Module.py
+	echo "		return ${upperName}ServiceImpl()" >> module/${lowerName}Module.py
 }
 
 # 반대 함수: rmvc
@@ -295,7 +294,7 @@ rmvc() {
     rm -f "controller/${lowerName}Controller.py"
     rm -f "service/inf/${lowerName}Service.py"
     rm -f "service/${lowerName}ServiceImpl.py"
-    rm -f "_module/modules/${lowerName}Module.py"
+    rm -f "module/${lowerName}Module.py"
 
     echo "🗑️  '${mdName}' 모듈 관련 파일 삭제가 완료되었습니다."
 }
@@ -355,7 +354,7 @@ db(){
 	echo "    __tablename__ = 'sample'" >> model/table.py
 
     # main.py
-    sed -i '/from _config.routeConfiurator import include_routers/a from db import engine, Base' main.py
+    sed -i '/from _config.routeConfigurator import include_routers/a from db import engine, Base' main.py
     sed -i '/from db import engine, Base/a from model.table import *' main.py
     echo "Base.metadata.create_all(bind=engine)" >> main.py
 }
