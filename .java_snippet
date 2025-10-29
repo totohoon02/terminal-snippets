@@ -1,23 +1,108 @@
-to_yml() {
-    local input_file="application.properties"
-    local dir="./src/main/resources"
+#!/bin/bash
 
-    if [ ! -f "$dir/$input_file" ]; then
+### =========================
+###  properties → YAML
+### =========================
+to_yml() {
+    local dir="./src/main/resources"
+    local input_file="$dir/application.properties"
+    local tmp_file="$dir/.tmp_application.yml"
+
+    if [ ! -f "$input_file" ]; then
         echo "❌ 파일을 찾을 수 없습니다: $input_file"
         return 1
     fi
 
-    mv "$dir/$input_file" "$dir/application.yml"
+    echo "🔄 properties → YAML 변환 중..."
+
+    awk -F'=' '
+    /^[[:space:]]*#/ { next }
+    /^[[:space:]]*$/ { next }
+
+    {
+        key=$1
+        value=$2
+        gsub(/^[ \t]+|[ \t]+$/, "", key)
+        gsub(/^[ \t]+|[ \t]+$/, "", value)
+        n = split(key, parts, ".")
+        indent=""
+
+        for (i=1; i<n; i++) {
+            printf "%s%s:\n", indent, parts[i]
+            indent = indent "  "
+        }
+
+        # 리스트 인덱스 처리 (ex: key[0]=)
+        match(parts[n], /(.*)\[([0-9]+)\]/, arr)
+        if (arr[1] != "") {
+            printf "%s%s:\n", indent, arr[1]
+            indent = indent "  "
+            printf "%s- %s\n\n", indent, value
+        } else {
+            printf "%s%s: %s\n\n", indent, parts[n], value
+        }
+    }' "$input_file" > "$tmp_file"
+
+    mv "$tmp_file" "$dir/application.yml"
+    rm -f "$input_file"
+
+    echo "✅ 변환 완료: $dir/application.yml (기존 properties 삭제됨)"
 }
 
-to_prop(){
-    local input_file="application.yml"
+### =========================
+###  YAML → properties
+### =========================
+to_prop() {
     local dir="./src/main/resources"
+    local input_file="$dir/application.yml"
+    local tmp_file="$dir/.tmp_application.properties"
 
-    if [ ! -f "$dir/$input_file" ]; then
+    if [ ! -f "$input_file" ]; then
         echo "❌ 파일을 찾을 수 없습니다: $input_file"
         return 1
     fi
 
-    mv "$dir/$input_file" "$dir/application.properties"
+    echo "🔄 YAML → properties 변환 중..."
+
+    awk '
+    /^[[:space:]]*#/ { next }
+    /^[[:space:]]*$/ { next }
+
+    {
+        indent = match($0, /[^ ]/) - 1
+        gsub(/^ +/, "", $0)
+        gsub(/"/, "", $0)
+        gsub(/'\''/, "", $0)
+
+        # 리스트 항목 처리 (- value)
+        if ($1 == "-") {
+            value = $2
+            level = indent / 2
+            idx[level]++
+            fullkey = path[0]
+            for (i=1; i<=level; i++) fullkey = fullkey "." path[i]
+            print fullkey "[" idx[level]-1 "]=" value
+            next
+        }
+
+        split($0, kv, ":")
+        key = kv[1]
+        value = kv[2]
+        sub(/^ +/, "", value)
+
+        level = indent / 2
+        path[level] = key
+        delete path[level+1]
+
+        if (value != "") {
+            fullkey = path[0]
+            for (i=1; i<=level; i++) fullkey = fullkey "." path[i]
+            print fullkey "=" value
+        }
+    }' "$input_file" > "$tmp_file"
+
+    mv "$tmp_file" "$dir/application.properties"
+    rm -f "$input_file"
+
+    echo "✅ 변환 완료: $dir/application.properties (기존 YAML 삭제됨)"
 }
