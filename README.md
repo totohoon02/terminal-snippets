@@ -36,7 +36,7 @@ source ~/terminal-snippets/.bash_include
 - **build** 'image:dev'
 - **dkrun** 'Ex_Port:Int_port ImageName'
 - **rmi** (remove danglings)
-
+- **dxc** 'containerName' (docker exec)
 ### bash
 
 - **pk** 'port' (kill port)
