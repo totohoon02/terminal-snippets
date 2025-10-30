@@ -159,23 +159,5 @@ lck(){
     fi
 }
 
-yml() {
-    # No input    
-    if [ -z "$1" ]; then
-        echo "Usage: yml <filename>"
-        echo "Example: yml chroma"
-        return 1
-    fi
-
-    # make dir    
-    local dir="./src/main/resources/config"
-    mkdir -p "$dir"
-
-    # curl yml and move
-    local ymlfile="$1"
-    lck -y $ymlfile
-    mv "${ymlfile}Config.yml" "$dir" 
-}
-
 alias sb="source ~/.bash_profile"
 alias sz="source ~/.zshrc"
