@@ -68,3 +68,11 @@ rmi(){
         docker rmi "$image_id"
     done
 }
+
+dxc() {
+    if [ -z "$1" ]; then
+        echo "Usage: dxc <container_name>"
+        return 1
+    fi
+    docker exec -it "$1" bash
+}
