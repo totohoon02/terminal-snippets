@@ -106,3 +106,47 @@ to_prop() {
 
     echo "✅ 변환 완료: $dir/application.properties (기존 YAML 삭제됨)"
 }
+
+ycon() {
+    # No input    
+    if [ -z "$1" ]; then
+        echo "Usage: ycon <filename>"
+        echo "Example: ycon chroma"
+        return 1
+    fi
+
+    # make dir    
+    local dir="./src/main/resources/config"
+    mkdir -p "$dir"
+
+    # curl yml and move
+    local ymlfile="$1"
+    lck -y $ymlfile
+    mv "${ymlfile}Config.yml" "$dir" 
+}
+
+jcon() {
+    # 1️⃣ 인자 확인
+    if [ -z "$1" ]; then
+        echo "Usage: jcon <filename>"
+        echo "Example: jcon swagger"
+        return 1
+    fi
+
+    # get project name
+    local project_name
+    project_name=$(basename "$(pwd)")
+
+    local target_dir="./src/main/java/${project_name}/config"
+    mkdir -p "$target_dir"
+
+    # 파일 명 및 curl
+    local classFile="$1"
+    classFile="$(tr '[:lower:]' '[:upper:]' <<< ${classFile:0:1})${classFile:1}"
+    
+    lck -j $classFile
+
+    # 이동
+    mv "${classFile}Config.java" "$target_dir/"
+
+}
