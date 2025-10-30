@@ -46,9 +46,15 @@ source ~/terminal-snippets/.bash_include
 - **rcopy** 'input' (reverse input and copy it -> tupni)
 - **after** 'date base_date(optional)'
 - **lck** '-d(optional) filename'
-- **yml** 'filename'
 - **sb** source ~/.bash_profile
 - **sz** soucre ~/.zshrc
+
+### java
+
+- **to_yml**
+- **to_prop**
+- **ycon** 'filename'
+- **jcon** 'filename'
 
 ### git
 
