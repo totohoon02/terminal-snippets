@@ -30,6 +30,7 @@ source ~/terminal-snippets/.bash_include
 
 - **up**
 - **down**
+- **dps**
 - **recon** down up --build
 - **pydocker** (basic python Docker file)
 - **jdocker** (basic java Docker file)
