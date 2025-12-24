@@ -1,5 +1,6 @@
 alias up="docker compose up -d"
 alias down="docker compose down"
+alias dps="docker ps"
 
 pydocker() {
     echo 'FROM python:3.10-slim' > Dockerfile
