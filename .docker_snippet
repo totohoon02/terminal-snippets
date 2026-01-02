@@ -27,7 +27,7 @@ pydocker() {
 
 jdocker() {
     cat <<EOF > Dockerfile
-FROM gradle:8.12-jdk21 AS build
+FROM gradle:jdk21 AS build
 WORKDIR /app
 
 # 의존성 캐싱
@@ -47,7 +47,7 @@ COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
 EOF
-} 
+}
 
 recon(){
     down
