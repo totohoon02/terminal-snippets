@@ -26,8 +26,7 @@ pydocker() {
 
 
 jdocker() {
-    # Dockerfile 생성 (덮어쓰기)
-    cat <<EOF > Dockerfile
+        cat <<EOF > Dockerfile
     FROM gradle:8.12-jdk21 AS build
     WORKDIR /app
     
@@ -48,7 +47,7 @@ jdocker() {
     EXPOSE 8080
     ENTRYPOINT ["java", "-jar", "app.jar"]
     EOF
-}
+} 
 
 recon(){
     down
