@@ -59,9 +59,14 @@ dkrun() {
     docker run -d -p "$port" "$iName"
 }
 
-
-build(){
-    docker buildx build -t "$@" .
+build() {
+    # 인자가 없으면 사용법 출력
+    if [ -z "$1" ]; then
+        echo "사용법: build [이미지이름:태그]"
+        return 1
+    fi
+    
+    docker buildx build --load -t kubs .
 }
 
 rmi(){
