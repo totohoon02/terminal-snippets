@@ -1,6 +1,7 @@
 alias up="docker compose up -d"
 alias down="docker compose down"
 alias dps="docker ps"
+alias dmgs="docker images"
 
 pydocker() {
     echo 'FROM python:3.10-slim' > Dockerfile
@@ -55,26 +56,32 @@ recon(){
 }
 
 dkrun() {
-    port=$1
-    iName=$2
-
-    if [ -z "$port" ] || [ -z "$iName" ]; then
-        echo "❌ 오류: 포트 번호와 이미지 이름을 입력하세요."
-        echo "사용법: drun <Ex_port:Int_port> <image_name>"
-        return 
+    # 인자가 정확히 3개가 아니면 사용법 안내 (포트, 이미지, 이름)
+    if [ $# -ne 3 ]; then
+        echo "Usage: dkrun [PORT:PORT] [IMAGE_NAME] [CONTAINER_NAME]"
+        return 1
     fi
 
-    docker run -d -p "$port" "$iName"
+    local port_mapping=$1
+    local image_name=$2
+    local container_name=$3
+
+    # 기존에 같은 이름의 컨테이너가 있다면 강제 삭제 (교체 목적)
+    docker rm -f "$container_name" 2>/dev/null
+    
+    # 컨테이너 실행
+    docker run -d -p "$port_mapping" --name "$container_name" "$image_name"
+    
+    echo "✅ Container '$container_name' is running on $port_mapping"
 }
 
 build() {
-    # 인자가 없으면 사용법 출력
     if [ -z "$1" ]; then
-        echo "사용법: build [이미지이름:태그]"
+        echo "사용법: build [이미지이름]"
         return 1
     fi
     
-    docker buildx build --load -t kubs .
+    docker buildx build --load -t "$1" .
 }
 
 rmi(){
@@ -89,4 +96,12 @@ dxc() {
         return 1
     fi
     docker exec -it "$1" bash
+}
+
+drmv() {
+    if [ -z "$1" ]; then
+        echo "Usage: drmv <container_name>"
+        return 1
+    fi
+    docker rm -f "$1"
 }
