@@ -61,7 +61,7 @@ dkrun() {
 
 
 build(){
-    docker build -t "$@" .
+    docker buildx build -t "$@" .
 }
 
 rmi(){
