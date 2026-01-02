@@ -31,6 +31,7 @@ source ~/terminal-snippets/.bash_include
 - **up**
 - **down**
 - **dps**
+- **dmgs**
 - **recon** down up --build
 - **pydocker** (basic python Docker file)
 - **jdocker** (basic java Docker file)
@@ -38,6 +39,7 @@ source ~/terminal-snippets/.bash_include
 - **dkrun** 'Ex_Port:Int_port ImageName'
 - **rmi** (remove danglings)
 - **dxc** 'containerName' (docker exec)
+- **drmv** 'containerName'
   
 ### bash
 
