@@ -55,7 +55,7 @@ recon(){
     up --build
 }
 
-dkrun() {
+drun() {
     # 인자가 정확히 3개가 아니면 사용법 안내 (포트, 이미지, 이름)
     if [ $# -ne 3 ]; then
         echo "Usage: dkrun [PORT:PORT] [IMAGE_NAME] [CONTAINER_NAME]"
@@ -75,7 +75,7 @@ dkrun() {
     echo "✅ Container '$container_name' is running on $port_mapping"
 }
 
-build() {
+dbuild() {
     if [ -z "$1" ]; then
         echo "사용법: build [이미지이름]"
         return 1
@@ -84,7 +84,7 @@ build() {
     docker buildx build --load -t "$1" .
 }
 
-rmi(){
+drmi(){
     if [ -n "$1" ]; then
         # 1. 인자($1)가 있는 경우: 해당 이미지 이름을 삭제
         echo "Deleting image: $1"
@@ -106,7 +106,7 @@ dxc() {
     docker exec -it "$1" bash
 }
 
-drmv() {
+drmc() {
     if [ -z "$1" ]; then
         echo "Usage: drmv <container_name>"
         return 1
