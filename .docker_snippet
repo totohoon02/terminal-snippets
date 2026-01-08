@@ -85,9 +85,17 @@ build() {
 }
 
 rmi(){
-    for image_id in $(docker images --filter "dangling=true" -q); do
-        docker rmi "$image_id"
-    done
+    if [ -n "$1" ]; then
+        # 1. 인자($1)가 있는 경우: 해당 이미지 이름을 삭제
+        echo "Deleting image: $1"
+        docker rmi "$1"
+    else
+        # 2. 인자가 없는 경우: 기존 로직(dangling 이미지 삭제) 실행
+        echo "No image name provided. Deleting dangling images..."
+        for image_id in $(docker images --filter "dangling=true" -q); do
+            docker rmi "$image_id"
+        done
+    fi
 }
 
 dxc() {
