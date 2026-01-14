@@ -1,22 +1,95 @@
+function list() {
+    local owner="totohoon02"
+    local repo="terminal-snippets"
+    local base_url="https://api.github.com/repos/$owner/$repo/contents"
+    local files=$(curl -s "$base_url" | grep -E '"name":|"download_url":' | sed 's/[",]//g')
+
+    echo "$files" | while read -r line; do
+        if [[ $line == *name:* ]]; then
+            current_name=$(echo "$line" | awk '{print $2}')
+        elif [[ $line == *download_url:* ]]; then
+            current_url=$(echo "$line" | awk '{print $2}')
+
+            if [[ "$current_name" == ".bash_include" || "$current_name" == "README.md" ]]; then
+                continue
+            fi
+
+            echo "### $current_name"
+            
+            # 모든 줄바꿈과 파일 끝 문제를 해결하기 위해 sed로 전처리 후 awk 실행
+            curl -s "$current_url" | tr -d '\r' | awk '
+            BEGIN { count = 0; func_name = ""; }
+
+            # 1. Alias 처리
+            /^[[:space:]]*alias / {
+                count++;
+                print count ". " $0;
+                func_name = "";
+                next;
+            }
+
+            # 2. 함수 선언부 매칭
+            /^[[:space:]]*(function[[:space:]]+)?[[:alnum:]_-]+[[:space:]]*\(\)/ || /^[[:space:]]*function[[:space:]]+[[:alnum:]_-]+/ {
+                # 이전에 찾은 함수가 있는데 주석을 못 만났다면 이름만 먼저 출력
+                if (func_name != "") { print count ". " func_name; }
+                
+                count++;
+                name = $0;
+                sub(/^[[:space:]]*function[[:space:]]+/, "", name);
+                sub(/[[:space:]]*\(.*/, "", name);
+                sub(/[[:space:]]*\{.*/, "", name);
+                gsub(/[[:space:]]/, "", name);
+                func_name = name;
+                next;
+            }
+
+            # 3. 함수 이름이 저장된 상태에서 주석을 만난 경우
+            func_name != "" && /^[[:space:]]*#/ {
+                comment = $0;
+                sub(/^[[:space:]]*#[[:space:]]*/, "", comment);
+                print count ". " func_name " : " comment;
+                func_name = ""; # 출력 완료
+                next;
+            }
+
+            # 4. 함수 이름이 있는데 주석이 아닌 실질적 코드가 나온 경우
+            func_name != "" && /[^[:space:]{}]/ {
+                print count ". " func_name;
+                func_name = "";
+            }
+
+            # 5. 파일 맨 마지막 줄 처리
+            END { if (func_name != "") print count ". " func_name; }
+            '
+            echo ""
+        fi
+    done
+}
+
 pk() {
-    port=$1
+    # 포트킬 pk 8080 | 동작 안함
+    local port=$1
 
     if [[ -z "$port" ]]; then
-        echo "Usage: $0 <port>"
-        exit 1
+        echo "Usage: lck <port>"
+        return 1
     fi
 
-    pid_to_kill=$(netstat -tuln 2>/dev/null | grep ":$port" | awk '{print $7}' | cut -d'/' -f1)
+    # lsof -t 옵션은 PID만 출력합니다.
+    # sudo를 붙여야 다른 사용자의 프로세스도 확인 가능합니다.
+    local pid_to_kill=$(sudo lsof -t -i:"$port")
 
     if [[ -n "$pid_to_kill" ]]; then
-        echo "killed process on $port"
-        kill -9 "$pid_to_kill"
+        echo "Killing process $pid_to_kill on port $port..."
+        echo "$pid_to_kill" | xargs sudo kill -9
+        echo "✅ Done."
     else
-        echo "No process found on $port"
+        echo "❌ No process found on port $port"
     fi
 }
 
 host() {
+    # 로컬호스트 페이지 열기 host 8080 | host 8080 -s
     if [ -z "$1" ]; then
         echo "Usage: host <port> [--secret]"
         return 1
@@ -52,6 +125,7 @@ host() {
 
 
 culst(){
+    # 로컬호스트 페이지 컬 culst 8080
     if [ -z "$1" ]; then
         echo "Usage: cost <port>"
         return 1
@@ -62,6 +136,7 @@ culst(){
 }
 
 rcopy(){
+    # deprecated
     reversed=$(echo $1 | awk '{ for(i=length; i>0; i--) printf "%s", substr($0, i, 1); print "" }')
     
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -80,6 +155,7 @@ rcopy(){
 }
 
 after() {
+    # deprecated
     if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
         echo "사용법: after <일수> [월-일]"
         echo "예시:"
@@ -107,6 +183,7 @@ after() {
 
 
 lck(){
+    # locker 레포지토리에서 파일 가져오기 lck -d redis | lck -y swagger | lck -j swagger
     # get file
     local baseUrl="https://raw.githubusercontent.com/totohoon02/locker/refs/heads/main"
     
