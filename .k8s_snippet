@@ -1,0 +1,14 @@
+alias k="kubectl"
+
+# Get Pod 
+kp() {
+  if [ -z "$1" ]; then
+    # 인자가 없으면 전체 네임스페이스 조회
+    echo "조회: [All Namespaces]"
+    kubectl get pod -A
+  else
+    # 인자가 있으면 해당 네임스페이스 조회
+    echo "조회: [Namespace: $1]"
+    kubectl get pod --namespace "$1"
+  fi
+}
