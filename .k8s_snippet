@@ -1,13 +1,21 @@
 alias k="kubectl"
+alias kget="kubectl get"
 alias kdesc="kubectl describe"
 
-# Get Pod
-kget() {
-  if [ -z "$1" ]; then
-    kubectl get pod
-  else
-    kubectl get pod --namespace "$1"
-  fi
+# Get Pods
+kgetp() {
+  kget pod ${1:+-n $1}
+}
+
+# Get Services
+# 이름을 kgets로 유지 (Service용)
+kgets() {
+  kget service ${1:+-n $1}
+}
+
+# Get Deployments
+kgetd() {
+  kget deployment ${1:+-n $1}
 }
 
 # apply Pod
