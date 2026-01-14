@@ -4,6 +4,7 @@ source ~/terminal-snippets/.docker_snippet
 source ~/terminal-snippets/.git_snippet
 source ~/terminal-snippets/.python_snippet
 source ~/terminal-snippets/.java_snippet
+source ~/terminal-snippets/.k8s_snippet
 
 list(){
 	curl https://raw.githubusercontent.com/totohoon02/terminal-snippets/refs/heads/main/README.md
