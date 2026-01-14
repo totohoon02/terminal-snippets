@@ -5,3 +5,52 @@ source ~/terminal-snippets/.git_snippet
 source ~/terminal-snippets/.python_snippet
 source ~/terminal-snippets/.java_snippet
 source ~/terminal-snippets/.k8s_snippet
+
+function list() {
+    local owner="totohoon02"
+    local repo="terminal-snippets"
+    local base_url="https://api.github.com/repos/$owner/$repo/contents"
+    
+    # 1. 파일 목록 가져오기
+    local files=$(curl -s "$base_url" | grep -E '"name":|"download_url":' | sed 's/[",]//g')
+
+    echo "$files" | while read -r line; do
+        if [[ $line == *name:* ]]; then
+            current_name=$(echo "$line" | awk '{print $2}')
+        elif [[ $line == *download_url:* ]]; then
+            current_url=$(echo "$line" | awk '{print $2}')
+
+            # 제외 파일
+            if [[ "$current_name" == ".bash_include" || "$current_name" == "README.md" ]]; then
+                continue
+            fi
+
+            echo "### $current_name"
+            
+            # 2. AWK로 alias는 전체, 함수는 이름만 추출
+            curl -s "$current_url" | tr -d '\r' | awk '
+            BEGIN { count = 0; }
+
+            # Alias: 한 줄 그대로 출력
+            /^[[:space:]]*alias[[:space:]]+/ {
+                count++;
+                print count ". " $0;
+                next;
+            }
+
+            # Function: 이름만 추출 (주석 무시)
+            /^[[:space:]]*(function[[:space:]]+)?[[:alnum:]_-]+[[:space:]]*\(\)/ || /^[[:space:]]*function[[:space:]]+[[:alnum:]_-]+/ {
+                count++;
+                name = $0;
+                sub(/^[[:space:]]*function[[:space:]]+/, "", name);
+                sub(/[[:space:]]*\(.*/, "", name);
+                sub(/[[:space:]]*\{.*/, "", name);
+                gsub(/[[:space:]]/, "", name);
+                
+                print count ". " name;
+            }
+            '
+            echo ""
+        fi
+    done
+}
