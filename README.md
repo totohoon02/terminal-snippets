@@ -40,7 +40,12 @@ source ~/terminal-snippets/.bash_include
 - **drmc** 'containerName'
 - **pydocker** (basic python Docker file)
 - **jdocker** (basic java Docker file)
-  
+
+### k8s
+
+- **k** 'kubectl'
+- **kp** 'kubectl get pod' <--namespce> 
+
 ### bash
 
 - **pk** 'port' (kill port)
