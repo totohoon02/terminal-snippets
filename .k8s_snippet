@@ -1,21 +1,38 @@
 alias k="kubectl"
 alias kget="kubectl get"
 alias kdesc="kubectl describe"
+alias kdel="kubectl delete"
 
-# Get Pods
 kgetp() {
   kget pod ${1:+-n $1}
 }
-
-# Get Services
-# 이름을 kgets로 유지 (Service용)
 kgets() {
   kget service ${1:+-n $1}
 }
-
-# Get Deployments
 kgetd() {
   kget deployment ${1:+-n $1}
+}
+
+# Describe
+kdescp() {
+  kdesc pod $1 ${2:+-n $2}
+}
+kdescs() {
+  kdesc service $1 ${2:+-n $2}
+}
+kdescd() {
+  kdesc deployment $1 ${2:+-n $2}
+}
+
+# Delete
+kdelp() {
+  kdel pod $1 ${2:+-n $2}
+}
+kdels() {
+  kdel service $1 ${2:+-n $2}
+}
+kdeld() {
+  kdel deployment $1 ${2:+-n $2}
 }
 
 # apply Pod
