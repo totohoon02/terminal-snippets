@@ -1,5 +1,5 @@
 alias k="kubectl"
-alias kdesc="kubectl descibe"
+alias kdesc="kubectl describe"
 
 # Get Pod
 kget() {
