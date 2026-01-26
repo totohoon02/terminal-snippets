@@ -1,6 +1,6 @@
 alias up="docker compose up -d"
 alias down="docker compose down"
-alias dps="docker ps"
+alias dps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}\t{{.Image}}"'
 alias dmgs="docker images"
 
 pydocker() {
