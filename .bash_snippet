@@ -1,22 +1,39 @@
 pk() {
-    # 포트킬 pk 8080 | 동작 안함
     local port=$1
 
     if [[ -z "$port" ]]; then
-        echo "Usage: lck <port>"
+        echo "Usage: pk <port>"
         return 1
     fi
 
-    # lsof -t 옵션은 PID만 출력합니다.
-    # sudo를 붙여야 다른 사용자의 프로세스도 확인 가능합니다.
-    local pid_to_kill=$(sudo lsof -t -i:"$port")
+    # OS 감지
+    if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+        # --- Windows (Git Bash / Cygwin) ---
+        echo "🔍 Searching for process on port $port (Windows)..."
+        
+        # netstat으로 PID 추출 (마지막 열이 PID)
+        local pid_to_kill=$(netstat -ano | grep ":$port " | awk '{print $5}' | head -n 1)
 
-    if [[ -n "$pid_to_kill" ]]; then
-        echo "Killing process $pid_to_kill on port $port..."
-        echo "$pid_to_kill" | xargs sudo kill -9
-        echo "✅ Done."
+        if [[ -n "$pid_to_kill" && "$pid_to_kill" != "0" ]]; then
+            echo "Killing process $pid_to_kill on port $port..."
+            taskkill //F //PID "$pid_to_kill"
+            echo "✅ Done."
+        else
+            echo "❌ No process found on port $port"
+        fi
+
     else
-        echo "❌ No process found on port $port"
+        # --- Linux / macOS (Original logic) ---
+        echo "🔍 Searching for process on port $port (Unix-like)..."
+        local pid_to_kill=$(sudo lsof -t -i:"$port")
+
+        if [[ -n "$pid_to_kill" ]]; then
+            echo "Killing process $pid_to_kill on port $port..."
+            echo "$pid_to_kill" | xargs sudo kill -9
+            echo "✅ Done."
+        else
+            echo "❌ No process found on port $port"
+        fi
     fi
 }
 
