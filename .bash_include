@@ -5,6 +5,7 @@ source ~/terminal-snippets/.git_snippet
 source ~/terminal-snippets/.python_snippet
 source ~/terminal-snippets/.java_snippet
 source ~/terminal-snippets/.k8s_snippet
+source ~/terminal-snippets/.ai_snippet
 
 function list() {
     local owner="totohoon02"
