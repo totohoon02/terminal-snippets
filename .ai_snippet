@@ -1,0 +1,2 @@
+# use claude 위험하게
+alias claude='claude --dangerously-skip-permissions'
