@@ -17,6 +17,85 @@ ignore(){
     fi
 }
 
+rball() {
+    # 1. 현재 브랜치 이름 저장 및 변경 사항(Stash) 확인
+    local current_branch=$(git branch --show-current)
+    local stashed=false
+    local skip_branches="main master develop"
+
+    # 작업 중인 변경 사항(인덱스/워킹 디렉터리)이 있는지 확인
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo "📦 작업 중인 변경 사항이 있어 임시 저장(stash)합니다..."
+        git stash -u # -u 옵션으로 추적되지 않는 파일(untracked)까지 안전하게 저장
+        stashed=true
+    fi
+
+    # 에러 발생 시 안전하게 복구하기 위한 내부 함수
+    cleanup_and_exit() {
+        echo "----------------------------------------"
+        echo "🔙 원래 브랜치($current_branch)로 복귀합니다."
+        git checkout "$current_branch" 2>/dev/null
+        
+        if [ "$stashed" = true ]; then
+            echo "📦 임시 저장했던 변경 사항을 복원합니다 (git stash pop)..."
+            git stash pop
+        fi
+        echo "✅ 모든 복구 절차가 완료되었습니다."
+    }
+
+    echo "🔄 develop 브랜치 선행 작업을 시작합니다..."
+
+    # 2. develop 브랜치 먼저 처리
+    if git branch | grep -qw "develop"; then
+        echo "🌿 [develop] 브랜치로 이동 중..."
+        if git checkout develop 2>/dev/null; then
+            echo "🚀 [develop]에서 'git rb' 실행 중..."
+            git rb
+            if [ $? -ne 0 ]; then
+                echo "❌ [develop] 작업 중 에러가 발생하여 작업을 중단합니다."
+                cleanup_and_exit
+                return 1
+            fi
+        else
+            echo "⚠️ [develop] 체크아웃에 실패하여 작업을 중단합니다."
+            cleanup_and_exit
+            return 1
+        fi
+    else
+        echo "ℹ️ 로컬에 develop 브랜치가 존재하지 않습니다. 나머지 브랜치만 진행합니다."
+    fi
+
+    echo "----------------------------------------"
+    echo "🔄 나머지 로컬 브랜치 순회를 시작합니다..."
+
+    # 3. 나머지 로컬 브랜치 순회
+    # subshell(| while read) 내부에서의 변수 변경 유지를 위해 process substitution 사용
+    while read -r branch; do
+        if echo "$skip_branches" | grep -qwq "$branch"; then
+            continue
+        fi
+
+        echo "----------------------------------------"
+        echo "🌿 [$branch] 브랜치로 이동 중..."
+        
+        if git checkout "$branch" 2>/dev/null; then
+            echo "🚀 'git rb' 실행 중..."
+            git rb
+
+            if [ $? -ne 0 ]; then
+                echo "❌ [$branch]에서 'git rb' 실행 중 에러가 발생했습니다."
+                # 개별 브랜치 에러 시 중단하고 싶다면 아래 주석을 해제하세요.
+                # cleanup_and_exit; return 1
+            fi
+        else
+            echo "⚠️  [$branch] 체크아웃에 실패했습니다."
+        fi
+    done < <(git branch | sed 's/[* ]//g')
+
+    # 4. 정상 종료 시 복구 작업 실행
+    cleanup_and_exit
+}
+
 # branches
 alias gbl="git branch -l"
 alias gco="git checkout"
