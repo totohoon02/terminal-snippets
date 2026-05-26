@@ -101,3 +101,6 @@ alias gbl="git branch -l"
 alias gco="git checkout"
 alias gcod="git checkout develop"
 alias gcood="git checkout origin/develop"
+
+# reset use carefully
+alias sorry="git reset --soft HEAD~1"
