@@ -38,34 +38,47 @@ pk() {
 }
 
 host() {
-    # 로컬호스트 페이지 열기 host 8080 | host 8080 -s
+    # host 8080       -> http://localhost:8080
+    # host 8080 -s    -> https://localhost:8080
+    # host 8080 -sc   -> http://localhost:8080 (시크릿 모드)
+
     if [ -z "$1" ]; then
-        echo "Usage: host <port> [--secret]"
+        echo "Usage: host <port> [-s|-sc]"
         return 1
     fi
 
     local port="$1"
-    local url="http://localhost:$port"
+    local protocol="http"
     local browser_flag=""
 
-    if [[ "$2" == "--secret" || "$2" == "-s" ]]; then
-        browser_flag="--incognito"
-    fi
+    case "$2" in
+        -s)
+            protocol="https"
+            ;;
+        -sc)
+            browser_flag="--incognito"
+            ;;
+    esac
+
+    local url="$protocol://localhost:$port"
 
     if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
         start chrome $browser_flag "$url"
+
     elif [[ "$OSTYPE" == "darwin"* ]]; then
         if [ -n "$browser_flag" ]; then
             open -a "Google Chrome" --new --args "$browser_flag" "$url"
         else
             open -a "Google Chrome" "$url"
         fi
+
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         if [ -n "$browser_flag" ]; then
             google-chrome "$browser_flag" "$url" &>/dev/null &
         else
             xdg-open "$url"
         fi
+
     else
         echo "Unsupported operating system: $OSTYPE"
         return 1
