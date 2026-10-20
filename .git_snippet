@@ -1,106 +1,229 @@
-# git
-ignore(){
-    if [[ "$(uname)" == "Darwin" ]] || [[ "$(uname)" == "Linux" ]]; then
-        language=$(echo "$1" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')
-    elif [[ "$(uname -o)" == "Msys" ]] || [[ "$(uname -o)" == "Cygwin" ]] || [[ "$(uname -o)" == "Windows_NT" ]]; then
-        language=$(echo "$1" | sed -r "s/^./\U&/")
+
+# ==========================================
+# Git Utilities
+# ==========================================
+
+# .gitignore 템플릿 다운로드
+ignore() {
+    if [ "$#" -ne 1 ] || [ -z "$1" ]; then
+        echo "Usage: ignore <language>"
+        return 1
     fi
 
-    if [[ "$language" == "Spring" ]]; then
-        curl https://raw.githubusercontent.com/spring-projects/spring-framework/refs/heads/main/.gitignore > .gitignore
-    elif  [[ "$language" == "Fastapi" ]]; then
-        curl https://raw.githubusercontent.com/fastapi/fastapi/refs/heads/master/.gitignore > .gitignore
-    elif  [[ "$language" == "Node" ]]; then
-        curl https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Node.gitignore > .gitignore
-    else 
-        curl https://raw.githubusercontent.com/github/gitignore/refs/heads/main/$language.gitignore > .gitignore
+    local language="${1,,}"
+    local url=""
+    local tmp_file
+
+    case "$language" in
+        spring)
+            url="https://raw.githubusercontent.com/spring-projects/spring-framework/refs/heads/main/.gitignore"
+            ;;
+        fastapi)
+            url="https://raw.githubusercontent.com/fastapi/fastapi/refs/heads/master/.gitignore"
+            ;;
+        *)
+            language="${language^}"
+            url="https://raw.githubusercontent.com/github/gitignore/refs/heads/main/${language}.gitignore"
+            ;;
+    esac
+
+    tmp_file=$(mktemp) || return 1
+
+    if curl -fLsS "$url" -o "$tmp_file"; then
+        mv "$tmp_file" .gitignore
+        echo ".gitignore updated: $language"
+    else
+        rm -f "$tmp_file"
+        echo "Failed to download .gitignore: $language"
+        return 1
     fi
 }
+
+# ==========================================
+# Gerrit Push
+# ==========================================
+
+# gp        -> develop
+# gp br     -> br
+gp() {
+    if [ "$#" -gt 1 ]; then
+        echo "Usage: gp [target-branch]"
+        return 1
+    fi
+
+    local target="${1:-develop}"
+    git push origin "HEAD:refs/for/$target"
+}
+
+# ==========================================
+# Rebase All Local Branches
+# ==========================================
 
 rball() {
-    # 1. 현재 브랜치 이름 저장 및 변경 사항(Stash) 확인
-    local current_branch=$(git branch --show-current)
-    local stashed=false
-    local skip_branches="main master develop"
+    local current_branch
+    local branch
+    local stash_ref=""
+    local failed=0
 
-    # 작업 중인 변경 사항(인덱스/워킹 디렉터리)이 있는지 확인
-    if ! git diff --quiet || ! git diff --cached --quiet; then
-        echo "📦 작업 중인 변경 사항이 있어 임시 저장(stash)합니다..."
-        git stash -u # -u 옵션으로 추적되지 않는 파일(untracked)까지 안전하게 저장
-        stashed=true
-    fi
-
-    # 에러 발생 시 안전하게 복구하기 위한 내부 함수
-    cleanup_and_exit() {
-        echo "----------------------------------------"
-        echo "🔙 원래 브랜치($current_branch)로 복귀합니다."
-        git checkout "$current_branch" 2>/dev/null
-        
-        if [ "$stashed" = true ]; then
-            echo "📦 임시 저장했던 변경 사항을 복원합니다 (git stash pop)..."
-            git stash pop
-        fi
-        echo "✅ 모든 복구 절차가 완료되었습니다."
+    # Git 저장소 및 브랜치 확인
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+        echo "Not a Git repository"
+        return 1
     }
 
-    echo "🔄 develop 브랜치 선행 작업을 시작합니다..."
+    current_branch=$(git symbolic-ref --quiet --short HEAD) || {
+        echo "Detached HEAD is not supported"
+        return 1
+    }
 
-    # 2. develop 브랜치 먼저 처리
-    if git branch | grep -qw "develop"; then
-        echo "🌿 [develop] 브랜치로 이동 중..."
-        if git checkout develop 2>/dev/null; then
-            echo "🚀 [develop]에서 'git rb' 실행 중..."
-            git rb
-            if [ $? -ne 0 ]; then
-                echo "❌ [develop] 작업 중 에러가 발생하여 작업을 중단합니다."
-                cleanup_and_exit
-                return 1
-            fi
-        else
-            echo "⚠️ [develop] 체크아웃에 실패하여 작업을 중단합니다."
-            cleanup_and_exit
-            return 1
-        fi
-    else
-        echo "ℹ️ 로컬에 develop 브랜치가 존재하지 않습니다. 나머지 브랜치만 진행합니다."
+    # 기존 리베이스/머지 진행 중인지 확인
+    if [ -d "$(git rev-parse --git-path rebase-merge)" ] ||
+       [ -d "$(git rev-parse --git-path rebase-apply)" ] ||
+       [ -f "$(git rev-parse --git-path MERGE_HEAD)" ] ||
+       [ -f "$(git rev-parse --git-path CHERRY_PICK_HEAD)" ]; then
+        echo "An unfinished Git operation exists"
+        return 1
     fi
 
-    echo "----------------------------------------"
-    echo "🔄 나머지 로컬 브랜치 순회를 시작합니다..."
+    # 변경 사항 임시 저장 (untracked 포함)
+    if [ -n "$(git status --porcelain --untracked-files=normal)" ]; then
+        echo "[stash] Saving local changes"
 
-    # 3. 나머지 로컬 브랜치 순회
-    # subshell(| while read) 내부에서의 변수 변경 유지를 위해 process substitution 사용
-    while read -r branch; do
-        if echo "$skip_branches" | grep -qwq "$branch"; then
-            continue
+        git stash push -u -m "rball-auto-stash" || return 1
+
+        # 가장 최근에 생성한 stash 식별
+        stash_ref=$(git rev-parse refs/stash) || return 1
+    fi
+
+    # 실패 시 원래 브랜치로 복귀
+    # 리베이스 충돌이 발생한 경우 자동 abort
+    rball_cleanup() {
+        local result=0
+
+        if [ -d "$(git rev-parse --git-path rebase-merge)" ] ||
+           [ -d "$(git rev-parse --git-path rebase-apply)" ]; then
+            echo "[rebase] Aborting failed rebase"
+            git rebase --abort || return 1
         fi
+
+        echo "[checkout] $current_branch"
+        git switch "$current_branch" || return 1
+
+        if [ -n "$stash_ref" ]; then
+            echo "[stash] Restoring local changes"
+
+            # apply 성공 시에만 drop
+            if git stash apply --index "$stash_ref"; then
+                local stash_entry
+                stash_entry=$(git stash list --format='%gd %H' |
+                    awk -v hash="$stash_ref" '$2 == hash {print $1; exit}')
+
+                if [ -n "$stash_entry" ]; then
+                    git stash drop "$stash_entry" || result=1
+                fi
+            else
+                echo "[stash] Restore failed. Stash preserved."
+                result=1
+            fi
+        fi
+
+        return "$result"
+    }
+
+    # 원격 정보 갱신 (한 번만)
+    echo "[fetch] origin"
+    if ! git fetch origin; then
+        echo "[error] Fetch failed"
+        rball_cleanup
+        return 1
+    fi
+
+    # develop 브랜치 갱신
+    if git show-ref --verify --quiet refs/heads/develop; then
+        echo "[checkout] develop"
+
+        if ! git switch develop; then
+            rball_cleanup
+            return 1
+        fi
+
+        echo "[rebase] develop -> origin/develop"
+        if ! git rebase origin/develop; then
+            echo "[error] develop rebase failed"
+            rball_cleanup
+            return 1
+        fi
+    fi
+
+    # 나머지 로컬 브랜치 순회
+    while IFS= read -r branch; do
+        case "$branch" in
+            main|master|develop)
+                continue
+                ;;
+        esac
 
         echo "----------------------------------------"
-        echo "🌿 [$branch] 브랜치로 이동 중..."
-        
-        if git checkout "$branch" 2>/dev/null; then
-            echo "🚀 'git rb' 실행 중..."
-            git rb
+        echo "[checkout] $branch"
 
-            if [ $? -ne 0 ]; then
-                echo "❌ [$branch]에서 'git rb' 실행 중 에러가 발생했습니다."
-                # 개별 브랜치 에러 시 중단하고 싶다면 아래 주석을 해제하세요.
-                # cleanup_and_exit; return 1
-            fi
-        else
-            echo "⚠️  [$branch] 체크아웃에 실패했습니다."
+        if ! git switch "$branch"; then
+            echo "[error] Checkout failed: $branch"
+            failed=1
+            break
         fi
-    done < <(git branch | sed 's/[* ]//g')
 
-    # 4. 정상 종료 시 복구 작업 실행
-    cleanup_and_exit
+        echo "[rebase] $branch -> origin/develop"
+
+        if ! git rebase origin/develop; then
+            echo "[error] Rebase failed: $branch"
+            failed=1
+            break
+        fi
+
+    done < <(git for-each-ref \
+        --format='%(refname:short)' refs/heads)
+
+    # 원래 브랜치 및 변경 사항 복원
+    if ! rball_cleanup; then
+        echo "[error] Cleanup failed"
+        return 1
+    fi
+
+    if [ "$failed" -ne 0 ]; then
+        echo "[error] rball stopped"
+        return 1
+    fi
+
+    echo "[success] rball completed"
 }
 
-# branches
+gco() {
+    local branch="$1"
+
+    if [ -z "$branch" ]; then
+        echo "Usage: gco <branch>"
+        return 1
+    fi
+
+    if git show-ref --verify --quiet "refs/heads/$branch"; then
+        git switch "$branch"
+    else
+        git switch -c "$branch"
+    fi
+}
+
+# ==========================================
+# Branch Aliases
+# ==========================================
+
 alias gbl="git branch -l"
-alias gco="git checkout"
+alias gbd="git branch -d"
 alias gcod="git checkout develop"
 alias gcood="git checkout origin/develop"
 
-# reset use carefully
+# ==========================================
+# Reset
+# ==========================================
+
+# 마지막 커밋 취소 (변경 사항은 staging에 유지)
 alias sorry="git reset --soft HEAD~1"
