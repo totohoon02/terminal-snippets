@@ -59,62 +59,76 @@ gp() {
 # Rebase All Local Branches
 # ==========================================
 
+
 rball() {
     local current_branch
     local branch
     local stash_ref=""
+    local stash_entry=""
     local failed=0
+    local cleanup_failed=0
+    local git_dir
 
-    # Git 저장소 및 브랜치 확인
+    # 1. Git 저장소 및 현재 브랜치 확인
     git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
-        echo "Not a Git repository"
+        echo "[error] Not a Git repository"
         return 1
     }
 
     current_branch=$(git symbolic-ref --quiet --short HEAD) || {
-        echo "Detached HEAD is not supported"
+        echo "[error] Detached HEAD is not supported"
         return 1
     }
 
-    # 기존 리베이스/머지 진행 중인지 확인
+    # 2. 진행 중인 Git 작업 확인
     if [ -d "$(git rev-parse --git-path rebase-merge)" ] ||
        [ -d "$(git rev-parse --git-path rebase-apply)" ] ||
        [ -f "$(git rev-parse --git-path MERGE_HEAD)" ] ||
        [ -f "$(git rev-parse --git-path CHERRY_PICK_HEAD)" ]; then
-        echo "An unfinished Git operation exists"
+        echo "[error] An unfinished Git operation exists"
         return 1
     fi
 
-    # 변경 사항 임시 저장 (untracked 포함)
-    if [ -n "$(git status --porcelain --untracked-files=normal)" ]; then
-        echo "[stash] Saving local changes"
+    # 3. 추적 파일의 변경 사항만 Stash
+    # Untracked 파일은 건드리지 않음
+    if ! git diff --quiet || ! git diff --cached --quiet; then
+        echo "[stash] Saving tracked changes"
 
-        git stash push -u -m "rball-auto-stash" || return 1
+        git stash push -m "rball-auto-stash" || {
+            echo "[error] Stash failed"
+            return 1
+        }
 
-        # 가장 최근에 생성한 stash 식별
         stash_ref=$(git rev-parse refs/stash) || return 1
     fi
 
-    # 실패 시 원래 브랜치로 복귀
-    # 리베이스 충돌이 발생한 경우 자동 abort
+    # 4. 복구 함수
+    # 충돌 시 리베이스 취소 후 원래 브랜치로 복귀
     rball_cleanup() {
         local result=0
 
         if [ -d "$(git rev-parse --git-path rebase-merge)" ] ||
            [ -d "$(git rev-parse --git-path rebase-apply)" ]; then
             echo "[rebase] Aborting failed rebase"
-            git rebase --abort || return 1
+
+            git rebase --abort || {
+                echo "[error] Rebase abort failed"
+                return 1
+            }
         fi
 
-        echo "[checkout] $current_branch"
-        git switch "$current_branch" || return 1
+        echo "[checkout] Returning to $current_branch"
 
+        git switch "$current_branch" || {
+            echo "[error] Failed to restore original branch"
+            return 1
+        }
+
+        # 이번 실행에서 생성한 Stash만 복원
         if [ -n "$stash_ref" ]; then
-            echo "[stash] Restoring local changes"
+            echo "[stash] Restoring tracked changes"
 
-            # apply 성공 시에만 drop
             if git stash apply --index "$stash_ref"; then
-                local stash_entry
                 stash_entry=$(git stash list --format='%gd %H' |
                     awk -v hash="$stash_ref" '$2 == hash {print $1; exit}')
 
@@ -122,7 +136,8 @@ rball() {
                     git stash drop "$stash_entry" || result=1
                 fi
             else
-                echo "[stash] Restore failed. Stash preserved."
+                echo "[error] Stash restore failed"
+                echo "[info] Stash preserved: $stash_ref"
                 result=1
             fi
         fi
@@ -130,32 +145,36 @@ rball() {
         return "$result"
     }
 
-    # 원격 정보 갱신 (한 번만)
+    # 5. 원격 정보 갱신 (1회)
     echo "[fetch] origin"
+
     if ! git fetch origin; then
         echo "[error] Fetch failed"
         rball_cleanup
         return 1
     fi
 
-    # develop 브랜치 갱신
+    # 6. develop 브랜치 갱신
     if git show-ref --verify --quiet refs/heads/develop; then
+        echo "----------------------------------------"
         echo "[checkout] develop"
 
         if ! git switch develop; then
+            echo "[error] Checkout develop failed"
             rball_cleanup
             return 1
         fi
 
         echo "[rebase] develop -> origin/develop"
+
         if ! git rebase origin/develop; then
-            echo "[error] develop rebase failed"
+            echo "[error] Develop rebase failed"
             rball_cleanup
             return 1
         fi
     fi
 
-    # 나머지 로컬 브랜치 순회
+    # 7. 나머지 로컬 브랜치 순회
     while IFS= read -r branch; do
         case "$branch" in
             main|master|develop)
@@ -183,19 +202,21 @@ rball() {
     done < <(git for-each-ref \
         --format='%(refname:short)' refs/heads)
 
-    # 원래 브랜치 및 변경 사항 복원
+    # 8. 원래 브랜치 및 변경 사항 복원
     if ! rball_cleanup; then
         echo "[error] Cleanup failed"
-        return 1
+        cleanup_failed=1
     fi
 
-    if [ "$failed" -ne 0 ]; then
+    if [ "$failed" -ne 0 ] || [ "$cleanup_failed" -ne 0 ]; then
         echo "[error] rball stopped"
         return 1
     fi
 
+    echo "----------------------------------------"
     echo "[success] rball completed"
 }
+
 
 gco() {
     local branch="$1"
