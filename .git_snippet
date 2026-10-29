@@ -233,6 +233,45 @@ gco() {
     fi
 }
 
+gcp() {
+    local name="$1"
+    local target="$2"
+    local fetch="$3"
+
+    if [ -z "$name" ] || [ -z "$target" ] || [ -z "$fetch" ]; then
+        echo "Usage: gcp <name> <target> <gerrit-fetch>"
+        return 1
+    fi
+
+    fetch="${fetch#git fetch }"
+
+    local remote="${fetch%% *}"
+    local ref="${fetch#* }"
+
+    if [ "$remote" = "$ref" ]; then
+        echo "Error: Gerrit URL and ref required"
+        return 1
+    fi
+
+    # 대상 브랜치 최신 정보 가져오기
+    git fetch origin "$target" || return 1
+
+    # Gerrit 커밋 가져오기
+    git fetch "$remote" "$ref" || return 1
+
+    local commit
+    commit=$(git rev-parse FETCH_HEAD) || return 1
+
+    # 가져온 커밋으로 브랜치 생성
+    git switch -c "$name" "$commit" || return 1
+
+    # 대상 브랜치 기준 작업 브랜치 생성
+    git switch -c "${name}-${target}" "origin/${target}" || return 1
+
+    # Cherry-pick
+    git cherry-pick "$name"
+}
+
 # ==========================================
 # Branch Aliases
 # ==========================================
