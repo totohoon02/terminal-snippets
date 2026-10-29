@@ -43,9 +43,9 @@ ignore() {
 # Gerrit Push
 # ==========================================
 
-# gp        -> develop
-# gp br     -> br
-gp() {
+# gitp        -> develop
+# gitp {br}     -> br
+gitp() {
     if [ "$#" -gt 1 ]; then
         echo "Usage: gp [target-branch]"
         return 1
@@ -233,7 +233,7 @@ gco() {
     fi
 }
 
-gcp() {
+gchp() {
     local name="$1"
     local target="$2"
     local fetch="$3"
