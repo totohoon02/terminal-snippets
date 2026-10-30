@@ -40,19 +40,29 @@ ignore() {
 }
 
 # ==========================================
-# Gerrit Push
+# Gerrit Push / Chat Alarm
 # ==========================================
 
 # gitp        -> develop
 # gitp {br}     -> br
 gitp() {
-    if [ "$#" -gt 1 ]; then
-        echo "Usage: gp [target-branch]"
+    local notify_script="C:/Users/sanghoon/Desktop/utils/notify_gerrit_push.py"
+    if [ "$#" -gt 2 ]; then
+        echo "Usage: gitp [target-branch] [space-id]" >&2
         return 1
     fi
 
     local target="${1:-develop}"
-    git push origin "HEAD:refs/for/$target"
+    local space_id="${2:-${GITP_SPACE_ID:-AAQAr4j3mks}}"
+    local commit
+    git check-ref-format "refs/heads/$target" || return "$?"
+    commit="$(git rev-parse --verify 'HEAD^{commit}')" || return "$?"
+
+    git push origin "$commit:refs/for/$target" || return "$?"
+    if ! "${GITP_PYTHON:-python}" "$notify_script" "$space_id" --target-branch "$target" --commit "$commit"; then
+        echo "Push는 성공했습니다. Chat 알림은 실패했으며 push를 다시 실행하지 않았습니다." >&2
+    fi
+    return 0
 }
 
 # ==========================================
